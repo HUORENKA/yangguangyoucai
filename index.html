@@ -524,7 +524,7 @@
                 <i class="fas fa-expand"></i> 聚焦查看
               </button>
             </div>
-            <iframe src="./pages/workbench/workbench_supplier.html"></iframe>
+            <iframe src="./pages/workbench/workbench_home.html"></iframe>
           </div>
 
           <!-- 卡片4：售后管理(采购侧) -->
@@ -605,13 +605,15 @@
         title: '工作台首页',
         path: './pages/workbench/workbench_home.html',
         roles: ['admin', 'buyer', 'buyer-user'],
-        status: 'ready'
+        status: 'ready',
+        defaultRole: 'buyer'  // 默认角色
       },
       workbench_supplier: {
         title: '供应商工作台',
-        path: './pages/workbench/workbench_supplier.html',
+        path: './pages/workbench/workbench_home.html',  // 同样指向 workbench_home.html
         roles: ['admin', 'supplier'],
-        status: 'ready'
+        status: 'ready',
+        defaultRole: 'supplier'  // 默认角色
       },
       after_sales_buyer: {
         title: '售后管理',
@@ -719,6 +721,12 @@
       // 更新当前页面
       currentPage = pageId;
       
+      // 如果配置了默认角色，则设置角色到 localStorage
+      if (config.defaultRole) {
+        localStorage.setItem('role', config.defaultRole);
+        console.log('已设置角色：', config.defaultRole);
+      }
+      
       // 更新菜单激活状态
       document.querySelectorAll('.menu-item').forEach(item => {
         item.classList.remove('active');
@@ -730,8 +738,9 @@
       // 更新页面标题
       document.getElementById('pageTitle').textContent = config.title;
       
-      // 加载 iframe
-      document.getElementById('mainIframe').src = config.path;
+      // 加载 iframe（添加时间戳强制刷新，确保角色状态生效）
+      const iframe = document.getElementById('mainIframe');
+      iframe.src = config.path + '?t=' + Date.now();
       
       // 切换到聚焦模式
       if (currentViewMode !== 'focus') {
@@ -744,8 +753,16 @@
       const config = pageConfig[pageId];
       if (config && config.status === 'ready') {
         currentPage = pageId;
+        
+        // 如果配置了默认角色，则设置角色到 localStorage
+        if (config.defaultRole) {
+          localStorage.setItem('role', config.defaultRole);
+          console.log('已设置角色：', config.defaultRole);
+        }
+        
         document.getElementById('pageTitle').textContent = config.title;
-        document.getElementById('mainIframe').src = config.path;
+        // 加载 iframe（添加时间戳强制刷新，确保角色状态生效）
+        document.getElementById('mainIframe').src = config.path + '?t=' + Date.now();
         switchViewMode('focus');
         
         // 更新菜单激活状态

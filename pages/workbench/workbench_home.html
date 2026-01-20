@@ -22,21 +22,64 @@
       .border-primary { border-color: #E2231A; }
     }
     
+    /* 模块卡片样式 */
+    .module-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      border: 1px solid rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+    }
+    
+    .module-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    
+    /* 模块标题图标样式 */
+    .module-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    
+    /* 数据行样式 */
+    .data-row {
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+    
+    .data-row:hover {
+      transform: translateX(4px);
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
     /* 消息列表项样式 */
     .message-item {
-      transition: all 0.2s;
+      transition: all 0.25s ease;
       border-left: 3px solid transparent;
     }
     
     .message-item:hover {
       background-color: #f8fafc;
       border-left-color: #E2231A;
+      transform: translateX(2px);
     }
     
-    /* 消息列表滚动容器 */
+    /* 消息列表滚动容器 - 固定显示5条消息 */
     .message-scroll-container {
-      max-height: 350px;
+      max-height: 210px;
       overflow-y: auto;
+    }
+    
+    /* 产品卡片16:9图片容器 */
+    .product-img-16-9 {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      object-fit: cover;
     }
     
     /* 自定义滚动条 */
@@ -60,307 +103,617 @@
     
     /* 商品卡片样式 */
     .product-card {
-      transition: all 0.2s;
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
     }
     
     .product-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border-color: #E2231A;
+    }
+    
+    .product-card:hover .product-img-16-9 {
+      transform: scale(1.05);
+    }
+    
+    .product-card .relative {
+      overflow: hidden;
+    }
+    
+    .product-card .product-img-16-9 {
+      transition: transform 0.3s ease;
+    }
+    
+    /* 查看全部链接样式 */
+    .view-all-link {
+      transition: all 0.2s ease;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    
+    .view-all-link:hover {
+      background-color: rgba(226, 35, 26, 0.08);
+      text-decoration: none !important;
+    }
+    
+    /* 数字高亮动画 */
+    .data-number {
+      transition: all 0.2s ease;
+    }
+    
+    .data-row:hover .data-number {
+      transform: scale(1.1);
+    }
+    
+    /* 消息标签样式 */
+    .message-tag {
+      font-weight: 600;
+      letter-spacing: 0.02em;
     }
   </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100">
   
   <!-- 主容器 -->
-  <div class="min-h-screen p-6 max-w-[1920px] mx-auto">
+  <div class="min-h-screen p-5 max-w-[1920px] mx-auto">
     
     <!-- 页面头部 -->
-    <div class="mb-6">
+    <div class="mb-5">
       <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-briefcase text-primary"></i>
-            工作台
-          </h1>
-          <p class="text-sm text-gray-600 mt-1">您的工作中心，快速处理待办事项</p>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+            <i class="fas fa-briefcase text-white text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">工作台</h1>
+            <p class="text-sm text-gray-500 mt-0.5">您的工作中心，快速处理待办事项</p>
+          </div>
         </div>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
-          <i class="fas fa-user-circle text-lg"></i>
-          <span id="userName">张三（采购专员）</span>
+        <!-- 角色切换下拉框 -->
+        <div class="flex items-center gap-2 mr-4">
+          <label class="text-sm text-gray-600 whitespace-nowrap">角色：</label>
+          <select 
+            id="roleSelector" 
+            class="px-3 py-1.5 border border-gray-300 rounded text-sm bg-white hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer"
+            onchange="switchRole(this.value)"
+          >
+            <option value="buyer">采购专员</option>
+            <option value="supplier">供应商</option>
+          </select>
+          <span id="roleHint" class="text-xs text-gray-500 max-w-[180px]">采购专员可审批采购单、跟进订单和售后</span>
+        </div>
+        
+        <!-- 用户信息 -->
+        <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm">
+          <div class="w-9 h-9 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-white text-sm"></i>
+          </div>
+          <span class="text-sm font-medium text-gray-700" id="userName">张三（采购专员）</span>
         </div>
       </div>
     </div>
     
     <!-- 内容区域 -->
     
-    <!-- ==================== 第一行：我的消息 + 采购单/订单管理 ==================== -->
-    <div class="grid grid-cols-12 gap-6 mb-6">
+    <!-- ==================== 第一行：我的消息 + 采购单 + 订单管理 ==================== -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
       
-      <!-- 左侧：我的消息（8列） -->
-      <div class="col-span-12 lg:col-span-8">
-        <div class="bg-white rounded-lg shadow-sm p-6 fade-in h-full flex flex-col">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="fas fa-bell text-primary"></i>
-              我的消息
-            </h2>
-            <a href="#" class="text-sm text-primary hover:underline">查看全部 →</a>
+      <!-- 我的消息 -->
+      <div class="module-card rounded-xl shadow-sm p-5 flex flex-col" style="min-height: 260px;">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-red-500 to-red-600 text-white shadow-sm">
+              <i class="fas fa-bell"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-800">我的消息</h2>
           </div>
-          
-          <!-- 消息列表（可滚动，5条） -->
-          <div class="message-scroll-container space-y-0 border-t border-gray-100 flex-1">
-            <div class="message-item flex items-center justify-between py-3 px-4 cursor-pointer">
-              <div class="flex items-center gap-3 flex-1">
-                <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded">采购单审核</span>
-                <span class="text-sm text-gray-700">商城订单采购审核流程</span>
-              </div>
-              <span class="text-xs text-gray-500 whitespace-nowrap ml-2">01-12 14:57:35</span>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+        
+        <!-- 消息列表（可滚动，10条记录，显示5条） -->
+        <div class="message-scroll-container space-y-0 border-t border-gray-100 flex-1 pt-2">
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-md whitespace-nowrap">采购单审核</span>
+              <span class="text-sm text-gray-700 truncate">商城订单采购审核流程</span>
             </div>
-            <div class="message-item flex items-center justify-between py-3 px-4 cursor-pointer">
-              <div class="flex items-center gap-3 flex-1">
-                <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded">采购单审核</span>
-                <span class="text-sm text-gray-700">商城订单采购审核流程</span>
-              </div>
-              <span class="text-xs text-gray-500 whitespace-nowrap ml-2">01-12 10:46:38</span>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-18</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md whitespace-nowrap">订单通知</span>
+              <span class="text-sm text-gray-700 truncate">订单ORD20260117已确认收货</span>
             </div>
-            <div class="message-item flex items-center justify-between py-3 px-4 cursor-pointer">
-              <div class="flex items-center gap-3 flex-1">
-                <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded">采购单审核</span>
-                <span class="text-sm text-gray-700">商城订单采购审核流程</span>
-              </div>
-              <span class="text-xs text-gray-500 whitespace-nowrap ml-2">12-25 22:17:58</span>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-17</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-md whitespace-nowrap">合同签署</span>
+              <span class="text-sm text-gray-700 truncate">合同HT2026015已审批通过</span>
             </div>
-            <div class="message-item flex items-center justify-between py-3 px-4 cursor-pointer">
-              <div class="flex items-center gap-3 flex-1">
-                <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">订单通知</span>
-                <span class="text-sm text-gray-700">您的订单已发货，请注意查收</span>
-              </div>
-              <span class="text-xs text-gray-500 whitespace-nowrap ml-2">12-25 18:30:12</span>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-15</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-md whitespace-nowrap">采购单审核</span>
+              <span class="text-sm text-gray-700 truncate">采购单PO20260114待您审核</span>
             </div>
-            <div class="message-item flex items-center justify-between py-3 px-4 cursor-pointer">
-              <div class="flex items-center gap-3 flex-1">
-                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">系统消息</span>
-                <span class="text-sm text-gray-700">账户安全验证提醒</span>
-              </div>
-              <span class="text-xs text-gray-500 whitespace-nowrap ml-2">12-24 16:20:45</span>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-14</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-green-100 text-green-700 rounded-md whitespace-nowrap">系统消息</span>
+              <span class="text-sm text-gray-700 truncate">您的账户安全验证已更新</span>
             </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-12</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md whitespace-nowrap">订单通知</span>
+              <span class="text-sm text-gray-700 truncate">您的订单ORD20260110已发货</span>
+            </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-10</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-red-100 text-red-700 rounded-md whitespace-nowrap">售后通知</span>
+              <span class="text-sm text-gray-700 truncate">售后申请SH20260108已受理</span>
+            </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-08</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-teal-100 text-teal-700 rounded-md whitespace-nowrap">结算通知</span>
+              <span class="text-sm text-gray-700 truncate">结算单JS20260105已完成付款</span>
+            </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-05</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-md whitespace-nowrap">采购单审核</span>
+              <span class="text-sm text-gray-700 truncate">采购单PO20260103审核不通过</span>
+            </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-03</span>
+          </div>
+          <div class="message-item flex items-center justify-between py-2.5 px-3 cursor-pointer rounded-r">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="message-tag px-2 py-1 text-xs bg-green-100 text-green-700 rounded-md whitespace-nowrap">系统消息</span>
+              <span class="text-sm text-gray-700 truncate">新年快乐！感谢您的支持</span>
+            </div>
+            <span class="text-xs text-gray-400 whitespace-nowrap ml-3">01-01</span>
           </div>
         </div>
       </div>
       
-      <!-- 右侧：采购单 + 订单管理（4列，上下排布） -->
-      <div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
-        
-        <!-- 采购单 -->
-        <div class="bg-white rounded-lg shadow-sm p-5 fade-in cursor-pointer hover:shadow-md transition-shadow flex-1" onclick="navigateTo('po-list')">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <i class="fas fa-file-invoice text-blue-600"></i>
-              采购单
-            </h3>
-            <i class="fas fa-chevron-right text-gray-400"></i>
+      <!-- 采购单 -->
+      <div id="poModule" class="module-card rounded-xl shadow-sm p-5 cursor-pointer flex flex-col" style="min-height: 260px;" onclick="navigateTo('po-list')">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-sm">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">采购单</h3>
           </div>
-          <div class="flex items-center gap-4">
-            <div class="flex-1 text-center py-4 bg-orange-50 rounded-lg">
-              <p class="text-3xl font-bold text-orange-600" id="poAuditCount">5</p>
-              <p class="text-xs text-gray-600 mt-2">审核中</p>
+          <a href="#" class="view-all-link text-sm text-primary font-medium" onclick="event.stopPropagation()">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+        <div class="space-y-2.5 flex-1 flex flex-col justify-center">
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-my-audit')">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-user-check text-blue-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">我的审核</span>
+            </div>
+            <span class="data-number text-lg font-bold text-blue-600" id="poMyAudit">10<span class="text-sm text-gray-400 font-normal">/20</span></span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-pending')">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-clock text-orange-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待审核</span>
+            </div>
+            <span class="data-number text-lg font-bold text-orange-600" id="poPending">5</span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-approved')">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-check-circle text-green-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">审核通过</span>
+            </div>
+            <span class="data-number text-lg font-bold text-green-600" id="poApproved">28</span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-red-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-rejected')">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-times-circle text-red-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">审核不通过</span>
+            </div>
+            <span class="data-number text-lg font-bold text-red-600" id="poRejected">3</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 订单管理 -->
+      <div class="module-card rounded-xl shadow-sm p-5 flex flex-col" style="min-height: 260px;">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-green-500 to-green-600 text-white shadow-sm">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">订单管理</h3>
+          </div>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+        <div class="space-y-2.5 flex-1 flex flex-col justify-center">
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-hourglass-half text-blue-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待供应商确认</span>
+            </div>
+            <span class="data-number text-lg font-bold text-blue-600" id="orderPending">8</span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-truck-loading text-orange-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待发货</span>
+            </div>
+            <span class="data-number text-lg font-bold text-orange-600" id="orderShipping">12</span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-truck text-green-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待收货</span>
+            </div>
+            <span class="data-number text-lg font-bold text-green-600" id="orderReceiving">15</span>
+          </div>
+          <!-- 最后一行：收货完成 | 已取消 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-teal-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-box-check text-teal-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">收货完成</span>
+              </div>
+              <span class="data-number text-lg font-bold text-teal-600" id="orderCompleted">56</span>
+            </div>
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-gray-100 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-ban text-gray-400 text-xs"></i>
+                <span class="text-sm font-medium text-gray-600">已取消</span>
+              </div>
+              <span class="data-number text-lg font-bold text-gray-500" id="orderCancelled">3</span>
             </div>
           </div>
         </div>
-        
-        <!-- 订单管理 -->
-        <div class="bg-white rounded-lg shadow-sm p-5 fade-in flex-1">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <i class="fas fa-shopping-bag text-green-600"></i>
-              订单管理
-            </h3>
-            <a href="#" class="text-xs text-primary hover:underline">查看全部 →</a>
-          </div>
-          <div class="space-y-2">
-            <div class="flex items-center justify-between py-2 px-3 bg-blue-50 rounded cursor-pointer hover:bg-blue-100">
-              <span class="text-sm text-gray-700">待供应商确认</span>
-              <span class="text-lg font-bold text-blue-600" id="orderPending">8</span>
-            </div>
-            <div class="flex items-center justify-between py-2 px-3 bg-orange-50 rounded cursor-pointer hover:bg-orange-100">
-              <span class="text-sm text-gray-700">待发货</span>
-              <span class="text-lg font-bold text-orange-600" id="orderShipping">12</span>
-            </div>
-            <div class="flex items-center justify-between py-2 px-3 bg-green-50 rounded cursor-pointer hover:bg-green-100">
-              <span class="text-sm text-gray-700">待收货</span>
-              <span class="text-lg font-bold text-green-600" id="orderReceiving">15</span>
-            </div>
-          </div>
-        </div>
-        
       </div>
       
     </div>
     
     <!-- ==================== 第二行：售后管理 + 合同签署 + 结算订单 ==================== -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
       
       <!-- 售后管理 -->
-      <div class="bg-white rounded-lg shadow-sm p-5 fade-in cursor-pointer hover:shadow-md transition-shadow" onclick="window.location.href='after_sales/after_sales_buyer.html'">
+      <div class="module-card rounded-xl shadow-sm p-5 cursor-pointer" onclick="window.location.href='after_sales/after_sales_buyer.html'">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-undo text-purple-600"></i>
-            售后管理
-          </h3>
-          <a href="after_sales/after_sales_buyer.html" class="text-xs text-primary hover:underline" onclick="event.stopPropagation()">查看全部 →</a>
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm">
+              <i class="fas fa-undo"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">售后管理</h3>
+          </div>
+          <a href="after_sales/after_sales_buyer.html" class="view-all-link text-sm text-primary font-medium" onclick="event.stopPropagation()">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
         </div>
-        <div class="space-y-2">
-          <div class="flex items-center justify-between py-2 px-3 bg-yellow-50 rounded cursor-pointer hover:bg-yellow-100" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=pending'">
-            <span class="text-sm text-gray-700">待确认</span>
-            <span class="text-lg font-bold text-yellow-600" id="afterSaleConfirm">3</span>
+        <div class="space-y-2.5">
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-yellow-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=pending'">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-question-circle text-yellow-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待确认</span>
+            </div>
+            <span class="data-number text-lg font-bold text-yellow-600" id="afterSaleConfirm">3</span>
           </div>
-          <div class="flex items-center justify-between py-2 px-3 bg-orange-50 rounded cursor-pointer hover:bg-orange-100" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=return'">
-            <span class="text-sm text-gray-700">待退货</span>
-            <span class="text-lg font-bold text-orange-600" id="afterSaleReturn">2</span>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=return'">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-box-open text-orange-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待退货</span>
+            </div>
+            <span class="data-number text-lg font-bold text-orange-600" id="afterSaleReturn">2</span>
           </div>
-          <div class="flex items-center justify-between py-2 px-3 bg-blue-50 rounded cursor-pointer hover:bg-blue-100" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=shipping'">
-            <span class="text-sm text-gray-700">退货中</span>
-            <span class="text-lg font-bold text-blue-600" id="afterSaleReturning">4</span>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=shipping'">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-shipping-fast text-blue-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">退货中</span>
+            </div>
+            <span class="data-number text-lg font-bold text-blue-600" id="afterSaleReturning">4</span>
+          </div>
+          <!-- 最后一行：退货完成 | 已取消 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-green-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=completed'">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check-double text-green-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">退货完成</span>
+              </div>
+              <span class="data-number text-lg font-bold text-green-600" id="afterSaleCompleted">18</span>
+            </div>
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-gray-100 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=cancelled'">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-ban text-gray-400 text-xs"></i>
+                <span class="text-sm font-medium text-gray-600">已取消</span>
+              </div>
+              <span class="data-number text-lg font-bold text-gray-500" id="afterSaleCancelled">5</span>
+            </div>
           </div>
         </div>
       </div>
       
       <!-- 合同签署 -->
-      <div class="bg-white rounded-lg shadow-sm p-5 fade-in">
+      <div class="module-card rounded-xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-file-signature text-indigo-600"></i>
-            合同签署
-          </h3>
-          <a href="#" class="text-xs text-primary hover:underline">查看全部 →</a>
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm">
+              <i class="fas fa-file-signature"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">合同签署</h3>
+          </div>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
         </div>
-        <div class="space-y-2">
-          <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded cursor-pointer hover:bg-gray-100">
-            <span class="text-sm text-gray-700">待提交</span>
-            <span class="text-lg font-bold text-gray-600" id="contractSubmit">6</span>
+        <div class="space-y-2.5">
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-gray-100 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-edit text-gray-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待提交</span>
+            </div>
+            <span class="data-number text-lg font-bold text-gray-600" id="contractSubmit">6</span>
           </div>
-          <div class="flex items-center justify-between py-2 px-3 bg-blue-50 rounded cursor-pointer hover:bg-blue-100">
-            <span class="text-sm text-gray-700">审批中</span>
-            <span class="text-lg font-bold text-blue-600" id="contractApproving">9</span>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-spinner text-blue-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">审批中</span>
+            </div>
+            <span class="data-number text-lg font-bold text-blue-600" id="contractApproving">9</span>
           </div>
-          <div class="flex items-center justify-between py-2 px-3 bg-red-50 rounded cursor-pointer hover:bg-red-100">
-            <span class="text-sm text-gray-700">退回</span>
-            <span class="text-lg font-bold text-red-600" id="contractRejected">1</span>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-red-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-reply text-red-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">退回</span>
+            </div>
+            <span class="data-number text-lg font-bold text-red-600" id="contractRejected">1</span>
+          </div>
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-check-circle text-green-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">通过</span>
+            </div>
+            <span class="data-number text-lg font-bold text-green-600" id="contractApproved">24</span>
           </div>
         </div>
       </div>
       
       <!-- 结算订单 -->
-      <div class="bg-white rounded-lg shadow-sm p-5 fade-in">
+      <div class="module-card rounded-xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fas fa-calculator text-teal-600"></i>
-            结算订单
-          </h3>
-          <a href="#" class="text-xs text-primary hover:underline">查看全部 →</a>
-        </div>
-        <div class="space-y-2">
-          <div class="flex items-center justify-between py-2 px-3 bg-yellow-50 rounded cursor-pointer hover:bg-yellow-100">
-            <span class="text-sm text-gray-700">待提交</span>
-            <span class="text-lg font-bold text-yellow-600" id="settlementSubmit">7</span>
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-sm">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">结算订单</h3>
           </div>
-          <div class="flex items-center justify-between py-2 px-3 bg-green-50 rounded cursor-pointer hover:bg-green-100">
-            <span class="text-sm text-gray-700">结算中</span>
-            <span class="text-lg font-bold text-green-600" id="settlementProcessing">11</span>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+        <div class="space-y-2.5">
+          <!-- 第一行：待提交 -->
+          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-yellow-50 rounded-lg cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-paper-plane text-yellow-500 text-sm"></i>
+              <span class="text-sm font-medium text-gray-700">待提交</span>
+            </div>
+            <span class="data-number text-lg font-bold text-yellow-600" id="settlementSubmit">7</span>
+          </div>
+          <!-- 第二行：编辑中 | 待核对 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-gray-100 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-pencil-alt text-gray-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">编辑中</span>
+              </div>
+              <span class="data-number text-lg font-bold text-gray-600" id="settlementEditing">4</span>
+            </div>
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-blue-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-search text-blue-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">待核对</span>
+              </div>
+              <span class="data-number text-lg font-bold text-blue-600" id="settlementChecking">6</span>
+            </div>
+          </div>
+          <!-- 第三行：待开票 | 待付款 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-orange-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-receipt text-orange-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">待开票</span>
+              </div>
+              <span class="data-number text-lg font-bold text-orange-600" id="settlementInvoice">8</span>
+            </div>
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-purple-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-credit-card text-purple-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">待付款</span>
+              </div>
+              <span class="data-number text-lg font-bold text-purple-600" id="settlementPayment">5</span>
+            </div>
+          </div>
+          <!-- 第四行：待收款 | 结算完成 -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-indigo-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-hand-holding-usd text-indigo-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">待收款</span>
+              </div>
+              <span class="data-number text-lg font-bold text-indigo-600" id="settlementReceiving">3</span>
+            </div>
+            <div class="data-row flex items-center justify-between py-2.5 px-3 bg-green-50 rounded-lg cursor-pointer">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check-double text-green-500 text-xs"></i>
+                <span class="text-sm font-medium text-gray-700">结算完成</span>
+              </div>
+              <span class="data-number text-lg font-bold text-green-600" id="settlementCompleted">42</span>
+            </div>
           </div>
         </div>
       </div>
       
     </div>
     
-    <!-- ==================== 第三行：我的收藏（占满一行） ==================== -->
-    <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <i class="fas fa-heart text-primary"></i>
-          我的收藏
-        </h2>
-        <a href="#" class="text-sm text-primary hover:underline">管理收藏 →</a>
-      </div>
-          
-          <!-- 商品网格 -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            
-            <!-- 商品1：A4纸 -->
-            <div class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer">
-              <div class="relative">
-                <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=300&h=300&fit=crop" alt="A4纸" class="w-full h-40 object-cover">
-                <button class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100">
-                  <i class="fas fa-heart text-primary text-sm"></i>
-                </button>
-              </div>
-              <div class="p-3">
-                <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">得力A4复印纸 70g 500张/包</h3>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-lg font-bold text-primary">¥28.50</span>
-                  <span class="text-xs text-gray-500 line-through">¥35.00</span>
-                </div>
-              </div>
+    <!-- ==================== 第三行：我的收藏 + 收藏公告（左右分列） ==================== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      
+      <!-- 我的收藏（左侧） -->
+      <div class="module-card rounded-xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-red-500 to-pink-500 text-white shadow-sm">
+              <i class="fas fa-heart"></i>
             </div>
-            
-            <!-- 商品2：打印机 -->
-            <div class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer">
-              <div class="relative">
-                <img src="https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=300&h=300&fit=crop" alt="打印机" class="w-full h-40 object-cover">
-                <button class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100">
-                  <i class="fas fa-heart text-primary text-sm"></i>
-                </button>
-              </div>
-              <div class="p-3">
-                <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">惠普M126a黑白激光多功能一体机</h3>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-lg font-bold text-primary">¥1,299</span>
-                  <span class="text-xs text-gray-500 line-through">¥1,599</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- 商品3：订书机 -->
-            <div class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer">
-              <div class="relative">
-                <img src="https://images.unsplash.com/photo-1583852096778-7bc43590f291?w=300&h=300&fit=crop" alt="订书机" class="w-full h-40 object-cover">
-                <button class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100">
-                  <i class="fas fa-heart text-primary text-sm"></i>
-                </button>
-              </div>
-              <div class="p-3">
-                <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">晨光标准型订书机 ABS92610</h3>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-lg font-bold text-primary">¥12.80</span>
-                  <span class="text-xs text-gray-500 line-through">¥18.00</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- 商品4：显示屏 -->
-            <div class="product-card bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer">
-              <div class="relative">
-                <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&h=300&fit=crop" alt="显示屏" class="w-full h-40 object-cover">
-                <button class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100">
-                  <i class="fas fa-heart text-primary text-sm"></i>
-                </button>
-              </div>
-              <div class="p-3">
-                <h3 class="text-sm font-medium text-gray-900 mb-1 line-clamp-2">戴尔24英寸IPS显示器 P2419H</h3>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-lg font-bold text-primary">¥899</span>
-                  <span class="text-xs text-gray-500 line-through">¥1,199</span>
-                </div>
-              </div>
-            </div>
-            
+            <h2 class="text-lg font-bold text-gray-800">我的收藏</h2>
           </div>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">管理收藏 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+            
+        <!-- 商品网格（4列布局） -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          
+          <!-- 商品1：A4纸 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=320&h=180&fit=crop" alt="A4纸" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">得力A4复印纸</h3>
+              <span class="text-sm font-bold text-primary">¥28.50</span>
+            </div>
+          </div>
+          
+          <!-- 商品2：打印机 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=320&h=180&fit=crop" alt="打印机" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">惠普一体机</h3>
+              <span class="text-sm font-bold text-primary">¥1,299</span>
+            </div>
+          </div>
+          
+          <!-- 商品3：订书机 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1583852096778-7bc43590f291?w=320&h=180&fit=crop" alt="订书机" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">晨光订书机</h3>
+              <span class="text-sm font-bold text-primary">¥12.80</span>
+            </div>
+          </div>
+          
+          <!-- 商品4：显示屏 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=320&h=180&fit=crop" alt="显示屏" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">戴尔显示器</h3>
+              <span class="text-sm font-bold text-primary">¥899</span>
+            </div>
+          </div>
+          
         </div>
       </div>
+      
+      <!-- 收藏公告（右侧） -->
+      <div class="module-card rounded-xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="module-icon bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-800">收藏公告</h2>
+          </div>
+          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+        </div>
+            
+        <!-- 公告网格（4列布局，仿照产品卡片样式） -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          
+          <!-- 公告1 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=320&h=180&fit=crop" alt="促销活动" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-fire text-white text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">年终大促8折起</h3>
+              <span class="text-sm text-gray-500">01-20</span>
+            </div>
+          </div>
+          
+          <!-- 公告2 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=320&h=180&fit=crop" alt="新用户优惠" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-tag text-white text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">新用户首单立减</h3>
+              <span class="text-sm text-gray-500">01-18</span>
+            </div>
+          </div>
+          
+          <!-- 公告3 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=320&h=180&fit=crop" alt="物流通知" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-truck text-white text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">春节物流安排</h3>
+              <span class="text-sm text-gray-500">01-15</span>
+            </div>
+          </div>
+          
+          <!-- 公告4 -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=320&h=180&fit=crop" alt="抽奖活动" class="product-img-16-9">
+              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-gift text-white text-xs"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">收藏抽奖赢大礼</h3>
+              <span class="text-sm text-gray-500">01-10</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
     </div>
     
     <!-- 页脚版权信息 -->
-    <div class="mt-8 text-center text-sm text-gray-500">
+    <div class="mt-5 text-center text-sm text-gray-400">
       <p>© 2026 阳光优采采购平台 | 工作台原型演示</p>
     </div>
     
@@ -368,6 +721,120 @@
   
   <!-- ==================== JavaScript ==================== -->
   <script>
+    // ========== 角色名称映射 ==========
+    const roleNameMap = {
+      'buyer': '采购专员',
+      'supplier': '供应商'
+    };
+    
+    // ========== 权限说明映射 ==========
+    const roleHintMap = {
+      'buyer': '采购专员可审批采购单、跟进订单和售后',
+      'supplier': '供应商可管理订单、售后和合同'
+    };
+    
+    // ========== 用户名称映射 ==========
+    const userNameMap = {
+      'buyer': '张三（采购专员）',
+      'supplier': '李四（供应商）'
+    };
+    
+    // ========== 获取当前角色 ==========
+    function getCurrentRole() {
+      const role = localStorage.getItem('role') || 'buyer';
+      // 只接受 buyer 或 supplier，其他值默认为 buyer
+      if (role === 'supplier') return 'supplier';
+      return 'buyer';
+    }
+    
+    // ========== 切换角色 ==========
+    function switchRole(newRole) {
+      // 保存到 localStorage
+      localStorage.setItem('role', newRole);
+      
+      // 更新权限说明
+      updateRoleHint(newRole);
+      
+      // 更新用户名显示
+      updateUserName(newRole);
+      
+      // 更新页面显示
+      updatePageByRole(newRole);
+      
+      console.log('已切换到角色：', roleNameMap[newRole] || newRole);
+    }
+    
+    // ========== 更新权限说明 ==========
+    function updateRoleHint(role) {
+      const hintElement = document.getElementById('roleHint');
+      if (hintElement) {
+        hintElement.textContent = roleHintMap[role] || '';
+      }
+    }
+    
+    // ========== 更新用户名显示 ==========
+    function updateUserName(role) {
+      const userNameElement = document.getElementById('userName');
+      if (userNameElement) {
+        userNameElement.textContent = userNameMap[role] || '用户';
+      }
+    }
+    
+    // ========== 根据角色更新页面 ==========
+    function updatePageByRole(role) {
+      // 更新页面标题
+      const pageTitle = document.querySelector('h1.text-2xl');
+      const pageDesc = document.querySelector('.text-sm.text-gray-500.mt-0\\.5');
+      
+      if (pageTitle) {
+        if (role === 'supplier') {
+          pageTitle.textContent = '供应商工作台';
+        } else {
+          pageTitle.textContent = '工作台';
+        }
+      }
+      
+      // 更新页面描述
+      if (pageDesc) {
+        if (role === 'supplier') {
+          pageDesc.textContent = '管理订单、结算和售后，提升服务效率';
+        } else {
+          pageDesc.textContent = '您的工作中心，快速处理待办事项';
+        }
+      }
+      
+      // 更新页面图标
+      const pageIcon = document.querySelector('.w-12.h-12 i');
+      if (pageIcon) {
+        if (role === 'supplier') {
+          pageIcon.className = 'fas fa-store text-white text-xl';
+        } else {
+          pageIcon.className = 'fas fa-briefcase text-white text-xl';
+        }
+      }
+      
+      // 更新按钮显示/隐藏（使用 data-role 属性）
+      const roleElements = document.querySelectorAll('[data-role]');
+      roleElements.forEach(el => {
+        const allowedRoles = el.getAttribute('data-role').split(',');
+        if (allowedRoles.includes(role)) {
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+      
+      // 更新采购单模块标题（供应商看到的是"订单确认"相关）
+      const poModuleTitle = document.querySelector('#poModule h3');
+      if (poModuleTitle) {
+        if (role === 'supplier') {
+          poModuleTitle.textContent = '待处理订单';
+        } else {
+          poModuleTitle.textContent = '采购单';
+        }
+      }
+    }
+    
     // ========== 页面跳转（模拟） ==========
     function navigateTo(page) {
       console.log('Navigate to:', page);
@@ -378,8 +845,16 @@
     document.addEventListener('DOMContentLoaded', function() {
       console.log('工作台首页加载完成');
       
-      // 可以在这里加载真实数据
-      // loadWorkbenchData();
+      // 读取保存的角色
+      const savedRole = getCurrentRole();
+      const roleSelector = document.getElementById('roleSelector');
+      
+      if (roleSelector) {
+        roleSelector.value = savedRole;
+        updateRoleHint(savedRole);
+        updateUserName(savedRole);
+        updatePageByRole(savedRole);
+      }
     });
   </script>
   
