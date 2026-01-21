@@ -11,6 +11,9 @@
   <!-- FontAwesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
   <!-- 自定义样式 -->
   <link rel="stylesheet" href="../../assets/custom.css">
   
@@ -82,6 +85,58 @@
       object-fit: cover;
     }
     
+    /* 产品卡片缩小图片样式 */
+    .product-img-small {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+    }
+    
+    /* 下架商品遮罩层 */
+    .product-disabled-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .product-disabled-badge {
+      background: rgba(107, 114, 128, 0.9);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* 查看更多卡片样式 */
+    .view-more-card {
+      border: 2px dashed #cbd5e1;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 130px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .view-more-card:hover {
+      border-color: #E2231A;
+      background: #fff5f5;
+    }
+    
     /* 自定义滚动条 */
     .message-scroll-container::-webkit-scrollbar {
       width: 6px;
@@ -151,6 +206,115 @@
       font-weight: 600;
       letter-spacing: 0.02em;
     }
+    
+    /* 图表切换按钮样式 */
+    .chart-toggle-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-weight: 500;
+    }
+    
+    .chart-toggle-btn.active {
+      background-color: #3b82f6;
+      color: white;
+    }
+    
+    .chart-toggle-btn.inactive {
+      background-color: #e5e7eb;
+      color: #4b5563;
+    }
+    
+    .chart-toggle-btn.inactive:hover {
+      background-color: #d1d5db;
+    }
+    
+    /* 图表容器样式 */
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    
+    /* 重要待办卡片样式 */
+    .todo-card {
+      background: white;
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 2px solid;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    
+    .todo-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      background: currentColor;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .todo-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+    
+    .todo-card:hover::before {
+      transform: scaleY(1);
+    }
+    
+    .todo-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    
+    .todo-card:hover .todo-card-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    .todo-card-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .todo-card-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+      line-height: 1.3;
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .todo-card-number {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -195,6 +359,188 @@
     </div>
     
     <!-- 内容区域 -->
+    
+    <!-- ==================== 重要待办行 ==================== -->
+    <div class="module-card rounded-xl shadow-sm p-5 mb-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="module-icon bg-gradient-to-br from-yellow-500 to-orange-500 text-white shadow-sm">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <h2 class="text-xl font-bold text-gray-800">重要待办</h2>
+        </div>
+      </div>
+      
+      <!-- 供应商角色待办（6个指标） -->
+      <div id="supplierTodos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" style="display: none;">
+        <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('po-list')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-blue-100 text-blue-600">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <div class="todo-card-label">待确认采购单</div>
+          </div>
+          <div class="todo-card-number text-blue-600" id="supplierTodo1">12</div>
+        </div>
+        <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('orders-list?status=pending')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-blue-100 text-blue-600">
+              <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="todo-card-label">待确认订单</div>
+          </div>
+          <div class="todo-card-number text-blue-600" id="supplierTodo2">8</div>
+        </div>
+        <div class="todo-card border-orange-200 text-orange-600" onclick="navigateTo('orders-list?status=shipping')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-orange-100 text-orange-600">
+              <i class="fas fa-truck-loading"></i>
+            </div>
+            <div class="todo-card-label">待发货订单</div>
+          </div>
+          <div class="todo-card-number text-orange-600" id="supplierTodo3">12</div>
+        </div>
+        <div class="todo-card border-yellow-200 text-yellow-600" onclick="window.location.href='after_sales/after_sales_supplier.html?tab=pending'">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-yellow-100 text-yellow-600">
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="todo-card-label">退货待确认</div>
+          </div>
+          <div class="todo-card-number text-yellow-600" id="supplierTodo4">3</div>
+        </div>
+        <div class="todo-card border-gray-200 text-gray-600" onclick="navigateTo('contract-list?status=pending')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-gray-100 text-gray-600">
+              <i class="fas fa-file-signature"></i>
+            </div>
+            <div class="todo-card-label">待提交合同</div>
+          </div>
+          <div class="todo-card-number text-gray-600" id="supplierTodo5">6</div>
+        </div>
+        <div class="todo-card border-orange-200 text-orange-600" onclick="navigateTo('settlement-list?status=invoice')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-orange-100 text-orange-600">
+              <i class="fas fa-receipt"></i>
+            </div>
+            <div class="todo-card-label">待开票</div>
+          </div>
+          <div class="todo-card-number text-orange-600" id="supplierTodo6">8</div>
+        </div>
+      </div>
+      
+      <!-- 采购专员角色待办（5个指标） -->
+      <div id="buyerTodos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('po-list?tab=my-audit')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-blue-100 text-blue-600">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <div class="todo-card-label">待我审核采购单</div>
+          </div>
+          <div class="todo-card-number text-blue-600" id="buyerTodo1">10</div>
+        </div>
+        <div class="todo-card border-green-200 text-green-600" onclick="navigateTo('orders-list?status=receiving')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-green-100 text-green-600">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="todo-card-label">待收货</div>
+          </div>
+          <div class="todo-card-number text-green-600" id="buyerTodo2">15</div>
+        </div>
+        <div class="todo-card border-orange-200 text-orange-600" onclick="window.location.href='after_sales/after_sales_buyer.html?tab=return'">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-orange-100 text-orange-600">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <div class="todo-card-label">待退货</div>
+          </div>
+          <div class="todo-card-number text-orange-600" id="buyerTodo3">2</div>
+        </div>
+        <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('contract-list?status=approving')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-blue-100 text-blue-600">
+              <i class="fas fa-file-signature"></i>
+            </div>
+            <div class="todo-card-label">待审核合同</div>
+          </div>
+          <div class="todo-card-number text-blue-600" id="buyerTodo4">9</div>
+        </div>
+        <div class="todo-card border-purple-200 text-purple-600" onclick="navigateTo('settlement-list?status=payment')">
+          <div class="todo-card-content">
+            <div class="todo-card-icon bg-purple-100 text-purple-600">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="todo-card-label">待付款</div>
+          </div>
+          <div class="todo-card-number text-purple-600" id="buyerTodo5">5</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ==================== 图表行：折线图 + 饼状图 ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+      
+      <!-- 折线图模块（占2/3宽度） -->
+      <div class="lg:col-span-2 module-card rounded-xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <!-- 左上角：总量/增量切换 -->
+          <div class="flex items-center gap-2">
+            <button id="lineChartTypeTotal" class="chart-toggle-btn active" onclick="switchLineChartType('total')">
+              总量
+            </button>
+            <button id="lineChartTypeIncrement" class="chart-toggle-btn inactive" onclick="switchLineChartType('increment')">
+              增量
+            </button>
+          </div>
+          
+          <!-- 右上角：时间维度切换 -->
+          <div class="flex items-center gap-2">
+            <button id="lineChartPeriodDay" class="chart-toggle-btn active" onclick="switchLineChartPeriod('day')">
+              日
+            </button>
+            <button id="lineChartPeriodWeek" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('week')">
+              周
+            </button>
+            <button id="lineChartPeriodMonth" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('month')">
+              月
+            </button>
+          </div>
+        </div>
+        
+        <!-- 折线图容器 -->
+        <div class="chart-container">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- 饼状图模块（占1/3宽度） -->
+      <div class="lg:col-span-1 module-card rounded-xl shadow-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-800">订单状态分布</h3>
+          
+          <!-- 右上角：时间维度切换 -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button id="pieChartPeriodMonth" class="chart-toggle-btn active text-xs px-2 py-1" onclick="switchPieChartPeriod('month')">
+              近一个月
+            </button>
+            <button id="pieChartPeriodYear" class="chart-toggle-btn inactive text-xs px-2 py-1" onclick="switchPieChartPeriod('year')">
+              近一年
+            </button>
+            <button id="pieChartPeriodAll" class="chart-toggle-btn inactive text-xs px-2 py-1" onclick="switchPieChartPeriod('all')">
+              全部
+            </button>
+          </div>
+        </div>
+        
+        <!-- 饼状图容器 -->
+        <div class="chart-container">
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+      
+    </div>
     
     <!-- ==================== 第一行：我的消息 + 采购单 + 订单管理 ==================== -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
@@ -301,7 +647,7 @@
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-my-audit')">
             <div class="flex items-center gap-2">
               <i class="fas fa-user-check text-blue-500 text-sm"></i>
-              <span class="text-sm font-medium text-gray-700">我的审核</span>
+              <span id="poMyAuditLabel" class="text-sm font-medium text-gray-700">我的审核</span>
             </div>
             <span class="data-number text-lg font-bold text-blue-600" id="poMyAudit">10<span class="text-sm text-gray-400 font-normal">/20</span></span>
           </div>
@@ -559,157 +905,142 @@
       
     </div>
     
-    <!-- ==================== 第三行：我的收藏 + 收藏公告（左右分列） ==================== -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      
-      <!-- 我的收藏（左侧） -->
-      <div class="module-card rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class="module-icon bg-gradient-to-br from-red-500 to-pink-500 text-white shadow-sm">
-              <i class="fas fa-heart"></i>
-            </div>
-            <h2 class="text-lg font-bold text-gray-800">我的收藏</h2>
+    <!-- ==================== 第三行：我的收藏（占满一行） ==================== -->
+    <div class="module-card rounded-xl shadow-sm p-4 mb-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="module-icon bg-gradient-to-br from-red-500 to-pink-500 text-white shadow-sm">
+            <i class="fas fa-heart"></i>
           </div>
-          <a href="#" class="view-all-link text-sm text-primary font-medium">管理收藏 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+          <h2 class="text-lg font-bold text-gray-800">我的收藏</h2>
         </div>
-            
-        <!-- 商品网格（4列布局） -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          
-          <!-- 商品1：A4纸 -->
-          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
-              <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=320&h=180&fit=crop" alt="A4纸" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
-                <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">得力A4复印纸</h3>
-              <span class="text-sm font-bold text-primary">¥28.50</span>
-            </div>
-          </div>
-          
-          <!-- 商品2：打印机 -->
-          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
-              <img src="https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=320&h=180&fit=crop" alt="打印机" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
-                <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">惠普一体机</h3>
-              <span class="text-sm font-bold text-primary">¥1,299</span>
-            </div>
-          </div>
-          
-          <!-- 商品3：订书机 -->
-          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
-              <img src="https://images.unsplash.com/photo-1583852096778-7bc43590f291?w=320&h=180&fit=crop" alt="订书机" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
-                <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">晨光订书机</h3>
-              <span class="text-sm font-bold text-primary">¥12.80</span>
-            </div>
-          </div>
-          
-          <!-- 商品4：显示屏 -->
-          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
-              <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=320&h=180&fit=crop" alt="显示屏" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
-                <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">戴尔显示器</h3>
-              <span class="text-sm font-bold text-primary">¥899</span>
-            </div>
-          </div>
-          
-        </div>
+        <a href="#" class="view-all-link text-sm text-primary font-medium">管理收藏 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
       </div>
-      
-      <!-- 收藏公告（右侧） -->
-      <div class="module-card rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <div class="module-icon bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-sm">
-              <i class="fas fa-bullhorn"></i>
-            </div>
-            <h2 class="text-lg font-bold text-gray-800">收藏公告</h2>
-          </div>
-          <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
-        </div>
-            
-        <!-- 公告网格（4列布局，仿照产品卡片样式） -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           
-          <!-- 公告1 -->
+      <!-- 商品网格（8列布局，占满整行） -->
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+          
+          <!-- 商品1：A4纸（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
             <div class="relative">
-              <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=320&h=180&fit=crop" alt="促销活动" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-fire text-white text-xs"></i>
+              <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=320&h=180&fit=crop" alt="A4纸" class="product-img-small">
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
               </button>
             </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">年终大促8折起</h3>
-              <span class="text-sm text-gray-500">01-20</span>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">得力A4复印纸</h3>
+              <span class="text-xs font-bold text-primary">¥28.50</span>
             </div>
           </div>
           
-          <!-- 公告2 -->
+          <!-- 商品2：打印机（下架） -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer opacity-75">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=320&h=180&fit=crop" alt="打印机" class="product-img-small">
+              <div class="product-disabled-overlay">
+                <div class="product-disabled-badge">
+                  <i class="fas fa-ban text-xs"></i>
+                  <span>已下架</span>
+                </div>
+              </div>
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all z-10">
+                <i class="fas fa-heart text-gray-400 text-xs"></i>
+              </button>
+            </div>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-500 mb-0.5 line-clamp-1">惠普一体机</h3>
+              <span class="text-xs font-bold text-gray-400 line-through">¥1,299</span>
+            </div>
+          </div>
+          
+          <!-- 商品3：订书机（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
             <div class="relative">
-              <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=320&h=180&fit=crop" alt="新用户优惠" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-tag text-white text-xs"></i>
+              <img src="https://images.unsplash.com/photo-1583852096778-7bc43590f291?w=320&h=180&fit=crop" alt="订书机" class="product-img-small">
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
               </button>
             </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">新用户首单立减</h3>
-              <span class="text-sm text-gray-500">01-18</span>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">晨光订书机</h3>
+              <span class="text-xs font-bold text-primary">¥12.80</span>
             </div>
           </div>
           
-          <!-- 公告3 -->
+          <!-- 商品4：显示屏（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
             <div class="relative">
-              <img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=320&h=180&fit=crop" alt="物流通知" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-truck text-white text-xs"></i>
+              <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=320&h=180&fit=crop" alt="显示屏" class="product-img-small">
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
               </button>
             </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">春节物流安排</h3>
-              <span class="text-sm text-gray-500">01-15</span>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">戴尔显示器</h3>
+              <span class="text-xs font-bold text-primary">¥899</span>
             </div>
           </div>
           
-          <!-- 公告4 -->
+          <!-- 商品5：键盘（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
             <div class="relative">
-              <img src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=320&h=180&fit=crop" alt="抽奖活动" class="product-img-16-9">
-              <button class="absolute top-1.5 right-1.5 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-gift text-white text-xs"></i>
+              <img src="https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=320&h=180&fit=crop" alt="键盘" class="product-img-small">
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
               </button>
             </div>
-            <div class="p-2">
-              <h3 class="text-sm font-medium text-gray-800 mb-1 line-clamp-1">收藏抽奖赢大礼</h3>
-              <span class="text-sm text-gray-500">01-10</span>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">机械键盘</h3>
+              <span class="text-xs font-bold text-primary">¥299</span>
             </div>
           </div>
           
-        </div>
+          <!-- 商品6：鼠标（下架） -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer opacity-75">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?w=320&h=180&fit=crop" alt="鼠标" class="product-img-small">
+              <div class="product-disabled-overlay">
+                <div class="product-disabled-badge">
+                  <i class="fas fa-ban text-xs"></i>
+                  <span>已下架</span>
+                </div>
+              </div>
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all z-10">
+                <i class="fas fa-heart text-gray-400 text-xs"></i>
+              </button>
+            </div>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-500 mb-0.5 line-clamp-1">无线鼠标</h3>
+              <span class="text-xs font-bold text-gray-400 line-through">¥89</span>
+            </div>
+          </div>
+          
+          <!-- 商品7：文件夹（正常） -->
+          <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1544396821-4dd40b938ad3?w=320&h=180&fit=crop" alt="文件夹" class="product-img-small">
+              <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-heart text-primary text-xs"></i>
+              </button>
+            </div>
+            <div class="p-1.5">
+              <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">A4文件夹</h3>
+              <span class="text-xs font-bold text-primary">¥15.90</span>
+            </div>
+          </div>
+          
+          <!-- 查看更多卡片 -->
+          <div class="view-more-card rounded-lg cursor-pointer" onclick="navigateTo('favorites')">
+            <div class="flex flex-col items-center justify-center gap-2 py-2">
+              <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="fas fa-chevron-right text-gray-400 text-lg"></i>
+              </div>
+              <span class="text-xs font-medium text-gray-600">查看更多</span>
+            </div>
+          </div>
+          
       </div>
-      
     </div>
     
     <!-- 页脚版权信息 -->
@@ -824,15 +1155,389 @@
         }
       });
       
-      // 更新采购单模块标题（供应商看到的是"订单确认"相关）
+      // 更新采购单模块标题（供应商和采购专员都显示"采购单"）
       const poModuleTitle = document.querySelector('#poModule h3');
       if (poModuleTitle) {
+        poModuleTitle.textContent = '采购单';
+      }
+      
+      // 更新"我的审核"文本（供应商显示"待确认采购单"，采购专员显示"我的审核"）
+      const myAuditLabel = document.getElementById('poMyAuditLabel');
+      if (myAuditLabel) {
         if (role === 'supplier') {
-          poModuleTitle.textContent = '待处理订单';
+          myAuditLabel.textContent = '待确认采购单';
         } else {
-          poModuleTitle.textContent = '采购单';
+          myAuditLabel.textContent = '我的审核';
         }
       }
+      
+      // 更新重要待办显示
+      const supplierTodos = document.getElementById('supplierTodos');
+      const buyerTodos = document.getElementById('buyerTodos');
+      if (supplierTodos && buyerTodos) {
+        if (role === 'supplier') {
+          supplierTodos.style.display = 'grid';
+          buyerTodos.style.display = 'none';
+        } else {
+          supplierTodos.style.display = 'none';
+          buyerTodos.style.display = 'grid';
+        }
+      }
+      
+      // 同步重要待办数据
+      updateTodosData(role);
+      
+      // 重新渲染折线图（因为角色变化会影响数据）
+      renderLineChart();
+    }
+    
+    // ========== 同步重要待办数据 ==========
+    function updateTodosData(role) {
+      if (role === 'supplier') {
+        // 供应商：从现有模块同步数据
+        const supplierTodo1 = document.getElementById('supplierTodo1'); // 待确认采购单
+        const supplierTodo2 = document.getElementById('supplierTodo2'); // 待确认订单
+        const supplierTodo3 = document.getElementById('supplierTodo3'); // 待发货订单
+        const supplierTodo4 = document.getElementById('supplierTodo4'); // 退货待确认
+        const supplierTodo5 = document.getElementById('supplierTodo5'); // 待提交合同
+        const supplierTodo6 = document.getElementById('supplierTodo6'); // 待开票
+        
+        // 同步数据（从现有模块获取）
+        if (supplierTodo1) supplierTodo1.textContent = document.getElementById('poMyAudit')?.textContent.split('/')[0] || '12';
+        if (supplierTodo2) supplierTodo2.textContent = document.getElementById('orderPending')?.textContent || '8';
+        if (supplierTodo3) supplierTodo3.textContent = document.getElementById('orderShipping')?.textContent || '12';
+        if (supplierTodo4) supplierTodo4.textContent = document.getElementById('afterSaleConfirm')?.textContent || '3';
+        if (supplierTodo5) supplierTodo5.textContent = document.getElementById('contractSubmit')?.textContent || '6';
+        if (supplierTodo6) supplierTodo6.textContent = document.getElementById('settlementInvoice')?.textContent || '8';
+      } else {
+        // 采购专员：从现有模块同步数据
+        const buyerTodo1 = document.getElementById('buyerTodo1'); // 待我审核采购单
+        const buyerTodo2 = document.getElementById('buyerTodo2'); // 待收货
+        const buyerTodo3 = document.getElementById('buyerTodo3'); // 待退货
+        const buyerTodo4 = document.getElementById('buyerTodo4'); // 待审核合同
+        const buyerTodo5 = document.getElementById('buyerTodo5'); // 待付款
+        
+        // 同步数据（从现有模块获取）
+        if (buyerTodo1) buyerTodo1.textContent = document.getElementById('poMyAudit')?.textContent.split('/')[0] || '10';
+        if (buyerTodo2) buyerTodo2.textContent = document.getElementById('orderReceiving')?.textContent || '15';
+        if (buyerTodo3) buyerTodo3.textContent = document.getElementById('afterSaleReturn')?.textContent || '2';
+        if (buyerTodo4) buyerTodo4.textContent = document.getElementById('contractApproving')?.textContent || '9';
+        if (buyerTodo5) buyerTodo5.textContent = document.getElementById('settlementPayment')?.textContent || '5';
+      }
+    }
+    
+    // ========== 图表相关变量 ==========
+    let lineChart = null;
+    let pieChart = null;
+    let lineChartType = 'total'; // 'total' 或 'increment'
+    let lineChartPeriod = 'day'; // 'day', 'week', 'month'
+    let pieChartPeriod = 'month'; // 'month', 'year', 'all'
+    
+    // ========== Mock 数据生成 ==========
+    function generateLineChartData(type, period, role) {
+      const data = {
+        labels: [],
+        datasets: []
+      };
+      
+      // 根据周期生成标签
+      if (period === 'day') {
+        for (let i = 29; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          data.labels.push(`${date.getMonth() + 1}-${date.getDate()}`);
+        }
+      } else if (period === 'week') {
+        for (let i = 11; i >= 0; i--) {
+          data.labels.push(`第${12 - i}周`);
+        }
+      } else if (period === 'month') {
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          data.labels.push(`${date.getMonth() + 1}月`);
+        }
+      }
+      
+      // 根据角色和类型生成数据
+      if (role === 'supplier') {
+        // 供应商：收到订单、完成订单
+        let receivedTotal = 500; // 初始累计值
+        let completedTotal = 400; // 初始累计值
+        
+        const receivedData = data.labels.map(() => {
+          if (type === 'total') {
+            // 总量：累计递增
+            receivedTotal += Math.floor(Math.random() * 20) + 10;
+            return receivedTotal;
+          } else {
+            // 增量：每期新增
+            return Math.floor(Math.random() * 30) + 10;
+          }
+        });
+        
+        const completedData = data.labels.map(() => {
+          if (type === 'total') {
+            // 总量：累计递增（完成数略少于收到数）
+            completedTotal += Math.floor(Math.random() * 15) + 8;
+            return completedTotal;
+          } else {
+            // 增量：每期新增
+            return Math.floor(Math.random() * 25) + 5;
+          }
+        });
+        
+        data.datasets = [
+          {
+            label: '收到订单',
+            data: receivedData,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: '完成订单',
+            data: completedData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }
+        ];
+      } else {
+        // 采购专员：发起订单、完成订单
+        let initiatedTotal = 500; // 初始累计值
+        let completedTotal = 400; // 初始累计值
+        
+        const initiatedData = data.labels.map(() => {
+          if (type === 'total') {
+            // 总量：累计递增
+            initiatedTotal += Math.floor(Math.random() * 20) + 10;
+            return initiatedTotal;
+          } else {
+            // 增量：每期新增
+            return Math.floor(Math.random() * 30) + 10;
+          }
+        });
+        
+        const completedData = data.labels.map(() => {
+          if (type === 'total') {
+            // 总量：累计递增（完成数略少于发起数）
+            completedTotal += Math.floor(Math.random() * 15) + 8;
+            return completedTotal;
+          } else {
+            // 增量：每期新增
+            return Math.floor(Math.random() * 25) + 5;
+          }
+        });
+        
+        data.datasets = [
+          {
+            label: '发起订单',
+            data: initiatedData,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: '完成订单',
+            data: completedData,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }
+        ];
+      }
+      
+      return data;
+    }
+    
+    function generatePieChartData(period) {
+      // 根据周期生成不同的数据
+      const baseData = {
+        'month': [12, 28, 35, 120, 8, 15],
+        'year': [95, 240, 290, 980, 65, 125],
+        'all': [320, 850, 920, 3200, 220, 450]
+      };
+      
+      const data = baseData[period] || baseData['month'];
+      
+      return {
+        labels: ['采购审核中', '待发货', '待收货', '收货完成', '已取消', '退货中'],
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#a855f7', // 采购审核中 - 紫色
+            '#f97316', // 待发货 - 橙色
+            '#10b981', // 待收货 - 绿色
+            '#059669', // 收货完成 - 深绿色
+            '#6b7280', // 已取消 - 灰色
+            '#ef4444'  // 退货中 - 红色
+          ],
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      };
+    }
+    
+    // ========== 折线图切换函数 ==========
+    function switchLineChartType(type) {
+      lineChartType = type;
+      
+      // 更新按钮状态
+      document.getElementById('lineChartTypeTotal').className = 
+        type === 'total' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      document.getElementById('lineChartTypeIncrement').className = 
+        type === 'increment' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      
+      // 重新渲染图表
+      renderLineChart();
+    }
+    
+    function switchLineChartPeriod(period) {
+      lineChartPeriod = period;
+      
+      // 更新按钮状态
+      document.getElementById('lineChartPeriodDay').className = 
+        period === 'day' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      document.getElementById('lineChartPeriodWeek').className = 
+        period === 'week' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      document.getElementById('lineChartPeriodMonth').className = 
+        period === 'month' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      
+      // 重新渲染图表
+      renderLineChart();
+    }
+    
+    // ========== 饼状图切换函数 ==========
+    function switchPieChartPeriod(period) {
+      pieChartPeriod = period;
+      
+      // 更新按钮状态
+      document.getElementById('pieChartPeriodMonth').className = 
+        period === 'month' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      document.getElementById('pieChartPeriodYear').className = 
+        period === 'year' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      document.getElementById('pieChartPeriodAll').className = 
+        period === 'all' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      
+      // 重新渲染图表
+      renderPieChart();
+    }
+    
+    // ========== 渲染折线图 ==========
+    function renderLineChart() {
+      const ctx = document.getElementById('lineChart');
+      if (!ctx) return;
+      
+      const role = getCurrentRole();
+      const chartData = generateLineChartData(lineChartType, lineChartPeriod, role);
+      
+      // 销毁旧图表
+      if (lineChart) {
+        lineChart.destroy();
+      }
+      
+      // 创建新图表
+      lineChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                font: {
+                  size: 11
+                }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: 11
+                },
+                maxRotation: 45,
+                minRotation: 0
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // ========== 渲染饼状图 ==========
+    function renderPieChart() {
+      const ctx = document.getElementById('pieChart');
+      if (!ctx) return;
+      
+      const chartData = generatePieChartData(pieChartPeriod);
+      
+      // 销毁旧图表
+      if (pieChart) {
+        pieChart.destroy();
+      }
+      
+      // 创建新图表
+      pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 12,
+                font: {
+                  size: 11
+                },
+                boxWidth: 12
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
     }
     
     // ========== 页面跳转（模拟） ==========
@@ -855,6 +1560,10 @@
         updateUserName(savedRole);
         updatePageByRole(savedRole);
       }
+      
+      // 初始化图表
+      renderLineChart();
+      renderPieChart();
     });
   </script>
   
