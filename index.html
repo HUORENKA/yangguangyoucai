@@ -797,6 +797,16 @@
         e.preventDefault();
         switchViewMode('overview');
       }
+      // 阻止数字键8触发快捷键组合提示（如果是在输入框外按下的）
+      if (e.key === '8' || e.key === 'Digit8') {
+        const target = e.target;
+        const isInputElement = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+        // 如果不在输入框中，则阻止默认行为
+        if (!isInputElement) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
     });
   </script>
   

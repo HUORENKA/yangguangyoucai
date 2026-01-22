@@ -315,6 +315,12 @@
       flex-shrink: 0;
       margin-left: auto;
     }
+
+    /* 供应商角色下，采购单只有3个指标，增加其高度以对齐订单管理的4个指标高度 */
+    [data-user-role="supplier"] .po-data-row {
+      padding-top: 18px !important;
+      padding-bottom: 18px !important;
+    }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -371,17 +377,8 @@
         </div>
       </div>
       
-      <!-- 供应商角色待办（6个指标） -->
-      <div id="supplierTodos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" style="display: none;">
-        <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('po-list')">
-          <div class="todo-card-content">
-            <div class="todo-card-icon bg-blue-100 text-blue-600">
-              <i class="fas fa-file-invoice"></i>
-            </div>
-            <div class="todo-card-label">待确认采购单</div>
-          </div>
-          <div class="todo-card-number text-blue-600" id="supplierTodo1">12</div>
-        </div>
+      <!-- 供应商角色待办（5个指标） -->
+      <div id="supplierTodos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" style="display: none;">
         <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('orders-list?status=pending')">
           <div class="todo-card-content">
             <div class="todo-card-icon bg-blue-100 text-blue-600">
@@ -389,7 +386,7 @@
             </div>
             <div class="todo-card-label">待确认订单</div>
           </div>
-          <div class="todo-card-number text-blue-600" id="supplierTodo2">8</div>
+          <div class="todo-card-number text-blue-600" id="supplierTodo1">8</div>
         </div>
         <div class="todo-card border-orange-200 text-orange-600" onclick="navigateTo('orders-list?status=shipping')">
           <div class="todo-card-content">
@@ -398,7 +395,7 @@
             </div>
             <div class="todo-card-label">待发货订单</div>
           </div>
-          <div class="todo-card-number text-orange-600" id="supplierTodo3">12</div>
+          <div class="todo-card-number text-orange-600" id="supplierTodo2">12</div>
         </div>
         <div class="todo-card border-yellow-200 text-yellow-600" onclick="window.location.href='after_sales/after_sales_supplier.html?tab=pending'">
           <div class="todo-card-content">
@@ -407,7 +404,7 @@
             </div>
             <div class="todo-card-label">退货待确认</div>
           </div>
-          <div class="todo-card-number text-yellow-600" id="supplierTodo4">3</div>
+          <div class="todo-card-number text-yellow-600" id="supplierTodo3">3</div>
         </div>
         <div class="todo-card border-gray-200 text-gray-600" onclick="navigateTo('contract-list?status=pending')">
           <div class="todo-card-content">
@@ -416,7 +413,7 @@
             </div>
             <div class="todo-card-label">待提交合同</div>
           </div>
-          <div class="todo-card-number text-gray-600" id="supplierTodo5">6</div>
+          <div class="todo-card-number text-gray-600" id="supplierTodo4">6</div>
         </div>
         <div class="todo-card border-orange-200 text-orange-600" onclick="navigateTo('settlement-list?status=invoice')">
           <div class="todo-card-content">
@@ -425,7 +422,7 @@
             </div>
             <div class="todo-card-label">待开票</div>
           </div>
-          <div class="todo-card-number text-orange-600" id="supplierTodo6">8</div>
+          <div class="todo-card-number text-orange-600" id="supplierTodo5">8</div>
         </div>
       </div>
       
@@ -647,28 +644,28 @@
           <a href="#" class="view-all-link text-sm text-primary font-medium" onclick="event.stopPropagation()">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
         </div>
         <div class="space-y-2.5 flex-1 flex flex-col justify-center">
-          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-my-audit')">
+          <div class="data-row po-data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer" data-role="buyer" onclick="event.stopPropagation(); navigateTo('po-my-audit')">
             <div class="flex items-center gap-2">
               <i class="fas fa-user-check text-blue-500 text-sm"></i>
               <span id="poMyAuditLabel" class="text-sm font-medium text-gray-700">我的审核</span>
             </div>
             <span class="data-number text-lg font-bold text-blue-600" id="poMyAudit">10<span class="text-sm text-gray-400 font-normal">/20</span></span>
           </div>
-          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-pending')">
+          <div class="data-row po-data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-pending')">
             <div class="flex items-center gap-2">
               <i class="fas fa-clock text-orange-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">待审核</span>
             </div>
             <span class="data-number text-lg font-bold text-orange-600" id="poPending">5</span>
           </div>
-          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-approved')">
+          <div class="data-row po-data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-approved')">
             <div class="flex items-center gap-2">
               <i class="fas fa-check-circle text-green-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">审核通过</span>
             </div>
             <span class="data-number text-lg font-bold text-green-600" id="poApproved">28</span>
           </div>
-          <div class="data-row flex items-center justify-between py-2.5 px-4 bg-red-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-rejected')">
+          <div class="data-row po-data-row flex items-center justify-between py-2.5 px-4 bg-red-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); navigateTo('po-rejected')">
             <div class="flex items-center gap-2">
               <i class="fas fa-times-circle text-red-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">审核不通过</span>
@@ -1116,6 +1113,9 @@
     
     // ========== 根据角色更新页面 ==========
     function updatePageByRole(role) {
+      // 在 body 上设置角色属性，供 CSS 使用
+      document.body.setAttribute('data-user-role', role);
+
       // 更新页面标题
       const pageTitle = document.querySelector('h1.text-2xl');
       const pageDesc = document.querySelector('.text-sm.text-gray-500.mt-0\\.5');
@@ -1164,14 +1164,10 @@
         poModuleTitle.textContent = '采购单';
       }
       
-      // 更新"我的审核"文本（供应商显示"待确认采购单"，采购专员显示"我的审核"）
+      // 更新"我的审核"文本（仅采购专员显示）
       const myAuditLabel = document.getElementById('poMyAuditLabel');
       if (myAuditLabel) {
-        if (role === 'supplier') {
-          myAuditLabel.textContent = '待确认采购单';
-        } else {
-          myAuditLabel.textContent = '我的审核';
-        }
+        myAuditLabel.textContent = '我的审核';
       }
       
       // 更新重要待办显示
@@ -1198,20 +1194,18 @@
     function updateTodosData(role) {
       if (role === 'supplier') {
         // 供应商：从现有模块同步数据
-        const supplierTodo1 = document.getElementById('supplierTodo1'); // 待确认采购单
-        const supplierTodo2 = document.getElementById('supplierTodo2'); // 待确认订单
-        const supplierTodo3 = document.getElementById('supplierTodo3'); // 待发货订单
-        const supplierTodo4 = document.getElementById('supplierTodo4'); // 退货待确认
-        const supplierTodo5 = document.getElementById('supplierTodo5'); // 待提交合同
-        const supplierTodo6 = document.getElementById('supplierTodo6'); // 待开票
+        const supplierTodo1 = document.getElementById('supplierTodo1'); // 待确认订单
+        const supplierTodo2 = document.getElementById('supplierTodo2'); // 待发货订单
+        const supplierTodo3 = document.getElementById('supplierTodo3'); // 退货待确认
+        const supplierTodo4 = document.getElementById('supplierTodo4'); // 待提交合同
+        const supplierTodo5 = document.getElementById('supplierTodo5'); // 待开票
         
         // 同步数据（从现有模块获取）
-        if (supplierTodo1) supplierTodo1.textContent = document.getElementById('poMyAudit')?.textContent.split('/')[0] || '12';
-        if (supplierTodo2) supplierTodo2.textContent = document.getElementById('orderPending')?.textContent || '8';
-        if (supplierTodo3) supplierTodo3.textContent = document.getElementById('orderShipping')?.textContent || '12';
-        if (supplierTodo4) supplierTodo4.textContent = document.getElementById('afterSaleConfirm')?.textContent || '3';
-        if (supplierTodo5) supplierTodo5.textContent = document.getElementById('contractSubmit')?.textContent || '6';
-        if (supplierTodo6) supplierTodo6.textContent = document.getElementById('settlementInvoice')?.textContent || '8';
+        if (supplierTodo1) supplierTodo1.textContent = document.getElementById('orderPending')?.textContent || '8';
+        if (supplierTodo2) supplierTodo2.textContent = document.getElementById('orderShipping')?.textContent || '12';
+        if (supplierTodo3) supplierTodo3.textContent = document.getElementById('afterSaleConfirm')?.textContent || '3';
+        if (supplierTodo4) supplierTodo4.textContent = document.getElementById('contractSubmit')?.textContent || '6';
+        if (supplierTodo5) supplierTodo5.textContent = document.getElementById('settlementInvoice')?.textContent || '8';
       } else {
         // 采购专员：从现有模块同步数据
         const buyerTodo1 = document.getElementById('buyerTodo1'); // 待我审核采购单
