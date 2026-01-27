@@ -377,10 +377,10 @@
         
         <!-- 阳光优采商城 -->
         <div class="menu-group-title">阳光优采商城</div>
-        <div class="menu-item" onclick="loadPage('home', this)" style="opacity: 0.5; cursor: not-allowed;">
+        <div class="menu-item" onclick="loadPage('home', this)">
           <i class="fas fa-home"></i>
-          <span>首页</span>
-          <span class="badge badge-count">待开发</span>
+          <span>商城首页</span>
+          <span class="badge badge-new">NEW</span>
         </div>
         <div class="menu-item" onclick="loadPage('category', this)" style="opacity: 0.5; cursor: not-allowed;">
           <i class="fas fa-list"></i>
@@ -580,6 +580,17 @@
             </div>
             <iframe src="./pages/store/store_detail.html"></iframe>
           </div>
+
+          <!-- 卡片8：商城首页 -->
+          <div class="iframe-card">
+            <div class="iframe-card-header">
+              <span><i class="fas fa-home"></i> 商城首页</span>
+              <button class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="focusPage('home')">
+                <i class="fas fa-expand"></i> 聚焦查看
+              </button>
+            </div>
+            <iframe src="./pages/home.html"></iframe>
+          </div>
           
           <!-- 占位卡片：待开发页面 -->
           <div class="iframe-card" style="opacity: 0.6;">
@@ -628,10 +639,10 @@
         status: 'pending'
       },
       home: {
-        title: '首页',
+        title: '商城首页',
         path: './pages/home.html',
         roles: ['admin', 'buyer', 'buyer-user', 'supplier', 'guest'],
-        status: 'pending'
+        status: 'ready'
       },
       store_list: {
         title: '店铺列表',

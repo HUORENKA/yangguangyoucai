@@ -53,12 +53,12 @@
     
     .sales-top-section .chart-card {
       min-height: auto;
-      padding: 16px;
+      padding: 12px;
     }
     
     .sales-top-section .chart-card h3 {
-      font-size: 14px;
-      margin-bottom: 12px;
+      font-size: 18px;
+      margin-bottom: 8px;
     }
     
     /* 销售TOP表格更紧凑 */
@@ -68,7 +68,7 @@
     }
     
     .sales-top-section .top-table tbody td {
-      padding: 8px 8px;
+      padding: 4px 8px;
       font-size: 12px;
     }
     
@@ -93,6 +93,19 @@
     
     .sales-top-section .top-table .name-cell .flex {
       gap: 8px;
+    }
+    
+    /* 销售TOP表格滚动容器：限制显示5行 */
+    .sales-top-section .table-scroll-container {
+      max-height: calc(5 * 40px); /* 每行约40px高度，显示5行，更紧凑 */
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
+    /* 销售TOP表格行高调整 - 更紧凑 */
+    .sales-top-section .top-table tbody tr {
+      height: 40px;
+      min-height: 40px;
     }
     
     /* 卡片样式美化 */
@@ -437,6 +450,11 @@
       color: #E2231A;
       font-size: 13px;
       text-align: right;
+    }
+    
+    /* 销售TOP模块金额单元格字体大小 */
+    .sales-top-section .top-table .amount-cell {
+      font-size: 13px;
     }
     
     .top-table .category-cell {
@@ -845,18 +863,18 @@
         </div>
       </div>
       
-      <!-- 三列 TOP10 -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- 四列 TOP10 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
         <!-- 采购方TOP10 -->
         <div class="chart-card rounded-xl p-4 fade-in">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
               <i class="fas fa-building text-primary text-xs"></i>
-              采购方 TOP10（按销售金额）
+              采购方 TOP10
             </h3>
           </div>
           
-          <div class="overflow-auto -mx-2 px-2">
+          <div class="table-scroll-container -mx-2 px-2">
             <table class="w-full top-table">
               <tbody id="topBuyerTbody"></tbody>
             </table>
@@ -868,33 +886,45 @@
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
               <i class="fas fa-store text-primary text-xs"></i>
-              供应商 TOP10（按销售金额）
+              供应商 TOP10
             </h3>
           </div>
           
-          <div class="overflow-auto -mx-2 px-2">
+          <div class="table-scroll-container -mx-2 px-2">
             <table class="w-full top-table">
               <tbody id="topSupplierTbody"></tbody>
             </table>
           </div>
         </div>
         
-        <!-- 热销商品TOP10 -->
+        <!-- 热销品类TOP10 -->
         <div class="chart-card rounded-xl p-4 fade-in">
-          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
               <i class="fas fa-fire text-primary text-xs"></i>
-              热销商品 TOP10（按销售金额）
+              热销品类 TOP10
             </h3>
-            <div class="flex gap-2">
-              <button id="btnHotDimCategory" class="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white font-semibold" onclick="setHotDim('category')">类别</button>
-              <button id="btnHotDimProduct" class="px-3 py-1.5 text-xs rounded-lg bg-gray-200 text-gray-700 font-medium" onclick="setHotDim('product')">产品</button>
-            </div>
           </div>
           
-          <div class="overflow-auto -mx-2 px-2">
+          <div class="table-scroll-container -mx-2 px-2">
             <table class="w-full top-table">
-              <tbody id="topHotTbody"></tbody>
+              <tbody id="topCategoryTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- 热销商品TOP10 -->
+        <div class="chart-card rounded-xl p-4 fade-in">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <i class="fas fa-box text-primary text-xs"></i>
+              热销商品 TOP10
+            </h3>
+          </div>
+          
+          <div class="table-scroll-container -mx-2 px-2">
+            <table class="w-full top-table">
+              <tbody id="topProductTbody"></tbody>
             </table>
           </div>
         </div>
@@ -985,14 +1015,12 @@
     
     // ========== 销售TOP：状态 ==========
     let salesTopRange = 'week'; // week | month | year | custom
-    let hotDim = 'category'; // category | product
     
     // ========== 页面加载时初始化 ==========
     document.addEventListener('DOMContentLoaded', function() {
       loadDashboardData();
       initCharts();
       setSalesTopRange('week');
-      setHotDim('category');
       renderSalesTop();
     });
     
@@ -1305,25 +1333,6 @@
       setSalesTopRange('custom');
     }
     
-    function setHotDim(dim) {
-      hotDim = dim;
-      const btnCat = document.getElementById('btnHotDimCategory');
-      const btnPro = document.getElementById('btnHotDimProduct');
-      if (btnCat && btnPro) {
-        if (dim === 'category') {
-          btnCat.classList.add('bg-blue-600', 'text-white', 'font-semibold');
-          btnCat.classList.remove('bg-gray-200', 'text-gray-700', 'font-medium');
-          btnPro.classList.remove('bg-blue-600', 'text-white', 'font-semibold');
-          btnPro.classList.add('bg-gray-200', 'text-gray-700', 'font-medium');
-        } else {
-          btnPro.classList.add('bg-blue-600', 'text-white', 'font-semibold');
-          btnPro.classList.remove('bg-gray-200', 'text-gray-700', 'font-medium');
-          btnCat.classList.remove('bg-blue-600', 'text-white', 'font-semibold');
-          btnCat.classList.add('bg-gray-200', 'text-gray-700', 'font-medium');
-        }
-      }
-      renderHotTop();
-    }
     
     function renderSalesTop() {
       const data = salesTopMock[salesTopRange] || salesTopMock.week;
@@ -1368,49 +1377,56 @@
           }).join('');
       }
       
-      renderHotTop();
+      renderCategoryTop();
+      renderProductTop();
     }
     
-    function renderHotTop() {
+    // 渲染热销品类TOP10
+    function renderCategoryTop() {
       const data = salesTopMock[salesTopRange] || salesTopMock.week;
-      const tbody = document.getElementById('topHotTbody');
+      const tbody = document.getElementById('topCategoryTbody');
       if (!tbody) return;
       
-      if (hotDim === 'category') {
-        tbody.innerHTML = data.hotCategory
-          .sort((a, b) => b.gmv - a.gmv)
-          .slice(0, 10)
-          .map((it, idx) => {
-            return `
-            <tr>
-              <td class="name-cell">
-                <div class="flex items-center gap-2">
-                  <span class="flex-shrink-0">${getRankBadge(idx)}</span>
-                  <span>${it.name}</span>
-                </div>
-              </td>
-              <td class="amount-cell">${formatMoney(it.gmv)}</td>
-            </tr>
-          `;
-          }).join('');
-      } else {
-        tbody.innerHTML = data.hotProduct
-          .sort((a, b) => b.gmv - a.gmv)
-          .slice(0, 10)
-          .map((it, idx) => {
-            return `
-            <tr>
-              <td class="name-cell">
-                <div class="flex items-center gap-2">
-                  <span class="flex-shrink-0">${getRankBadge(idx)}</span>
-                  <span>${it.name}</span>
-                </div>
-              </td>
-              <td class="amount-cell">${formatMoney(it.gmv)}</td>
-            </tr>
-          `;
-          }).join('');
-      }
+      tbody.innerHTML = data.hotCategory
+        .sort((a, b) => b.gmv - a.gmv)
+        .slice(0, 10)
+        .map((it, idx) => {
+          return `
+          <tr>
+            <td class="name-cell">
+              <div class="flex items-center gap-2">
+                <span class="flex-shrink-0">${getRankBadge(idx)}</span>
+                <span>${it.name}</span>
+              </div>
+            </td>
+            <td class="amount-cell">${formatMoney(it.gmv)}</td>
+          </tr>
+        `;
+        }).join('');
+    }
+    
+    // 渲染热销商品TOP10
+    function renderProductTop() {
+      const data = salesTopMock[salesTopRange] || salesTopMock.week;
+      const tbody = document.getElementById('topProductTbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = data.hotProduct
+        .sort((a, b) => b.gmv - a.gmv)
+        .slice(0, 10)
+        .map((it, idx) => {
+          return `
+          <tr>
+            <td class="name-cell">
+              <div class="flex items-center gap-2">
+                <span class="flex-shrink-0">${getRankBadge(idx)}</span>
+                <span>${it.name}</span>
+              </div>
+            </td>
+            <td class="amount-cell">${formatMoney(it.gmv)}</td>
+          </tr>
+        `;
+        }).join('');
     }
     
     // ========== 刷新数据 ==========

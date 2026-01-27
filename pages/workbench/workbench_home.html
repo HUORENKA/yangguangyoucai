@@ -238,6 +238,38 @@
       height: 300px;
     }
     
+    /* 自定义时间选择器内联样式 */
+    .custom-date-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 8px;
+      padding: 6px 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .custom-date-inline input[type="date"] {
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    
+    .custom-date-inline input[type="date"]:focus {
+      outline: none;
+      border-color: #E2231A;
+      box-shadow: 0 0 0 3px rgba(226, 35, 26, 0.1);
+    }
+    
+    .custom-date-inline button {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+    
     /* 重要待办卡片样式 */
     .todo-card {
       background: white;
@@ -335,10 +367,10 @@
           <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
             <i class="fas fa-briefcase text-white text-xl"></i>
           </div>
-          <div>
+        <div>
             <h1 class="text-2xl font-bold text-gray-900">工作台</h1>
             <p class="text-sm text-gray-500 mt-0.5">您的工作中心，快速处理待办事项</p>
-          </div>
+        </div>
         </div>
         <!-- 角色切换下拉框 -->
         <div class="flex items-center gap-2 mr-4">
@@ -368,44 +400,44 @@
     
     <!-- ==================== 重要待办行 ==================== -->
     <div class="module-card rounded-xl shadow-sm p-5 mb-5">
-      <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
           <div class="module-icon bg-gradient-to-br from-yellow-500 to-orange-500 text-white shadow-sm">
             <i class="fas fa-tasks"></i>
           </div>
           <h2 class="text-xl font-bold text-gray-800">重要待办</h2>
         </div>
-      </div>
-      
+          </div>
+          
       <!-- 供应商角色待办（5个指标） -->
       <div id="supplierTodos" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3" style="display: none;">
         <div class="todo-card border-blue-200 text-blue-600" onclick="navigateTo('orders-list?status=pending')">
           <div class="todo-card-content">
             <div class="todo-card-icon bg-blue-100 text-blue-600">
               <i class="fas fa-hourglass-half"></i>
-            </div>
+              </div>
             <div class="todo-card-label">待确认订单</div>
-          </div>
+            </div>
           <div class="todo-card-number text-blue-600" id="supplierTodo1">8</div>
-        </div>
+              </div>
         <div class="todo-card border-orange-200 text-orange-600" onclick="navigateTo('orders-list?status=shipping')">
           <div class="todo-card-content">
             <div class="todo-card-icon bg-orange-100 text-orange-600">
               <i class="fas fa-truck-loading"></i>
             </div>
             <div class="todo-card-label">待发货订单</div>
-          </div>
+              </div>
           <div class="todo-card-number text-orange-600" id="supplierTodo2">12</div>
-        </div>
+            </div>
         <div class="todo-card border-yellow-200 text-yellow-600" onclick="window.location.href='after_sales/after_sales_supplier.html?tab=pending'">
           <div class="todo-card-content">
             <div class="todo-card-icon bg-yellow-100 text-yellow-600">
               <i class="fas fa-question-circle"></i>
-            </div>
+              </div>
             <div class="todo-card-label">退货待确认</div>
-          </div>
+            </div>
           <div class="todo-card-number text-yellow-600" id="supplierTodo3">3</div>
-        </div>
+              </div>
         <div class="todo-card border-gray-200 text-gray-600" onclick="navigateTo('contract-list?status=pending')">
           <div class="todo-card-content">
             <div class="todo-card-icon bg-gray-100 text-gray-600">
@@ -482,29 +514,41 @@
       <!-- 折线图模块（占2/3宽度） -->
       <div class="lg:col-span-2 module-card rounded-xl shadow-sm p-5">
         <div class="flex items-center justify-between mb-4">
-          <!-- 左侧：标题 + 总量/增量切换 -->
+          <!-- 左侧：标题 + 时间维度切换 + 自定义按钮 -->
           <div class="flex items-center gap-4">
             <h3 class="text-lg font-bold text-gray-800">订单数量趋势</h3>
             <div class="flex items-center gap-2">
-              <button id="lineChartTypeTotal" class="chart-toggle-btn active" onclick="switchLineChartType('total')">
-                总量
+              <button id="lineChartPeriodDay" class="chart-toggle-btn active" onclick="switchLineChartPeriod('day')">
+                日
               </button>
-              <button id="lineChartTypeIncrement" class="chart-toggle-btn inactive" onclick="switchLineChartType('increment')">
-                增量
+              <button id="lineChartPeriodWeek" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('week')">
+                周
               </button>
+              <button id="lineChartPeriodMonth" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('month')">
+                月
+              </button>
+              <button id="lineChartPeriodCustom" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('custom')">
+                自定义
+              </button>
+              
+              <!-- 自定义时间选择器：内联显示在"自定义"按钮右侧 -->
+              <div id="customDatePicker" class="hidden custom-date-inline">
+                <span class="text-xs text-gray-600 whitespace-nowrap">开始</span>
+                <input type="date" id="customDateStart" class="px-2 py-1 border border-gray-300 rounded text-sm" />
+                <span class="text-xs text-gray-600 whitespace-nowrap">结束</span>
+                <input type="date" id="customDateEnd" class="px-2 py-1 border border-gray-300 rounded text-sm" />
+                <button onclick="applyCustomDate()" class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">确定</button>
+              </div>
             </div>
           </div>
           
-          <!-- 右上角：时间维度切换 -->
+          <!-- 右侧：总量/增量切换 -->
           <div class="flex items-center gap-2">
-            <button id="lineChartPeriodDay" class="chart-toggle-btn active" onclick="switchLineChartPeriod('day')">
-              日
+            <button id="lineChartTypeTotal" class="chart-toggle-btn active" onclick="switchLineChartType('total')">
+              总量
             </button>
-            <button id="lineChartPeriodWeek" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('week')">
-              周
-            </button>
-            <button id="lineChartPeriodMonth" class="chart-toggle-btn inactive" onclick="switchLineChartPeriod('month')">
-              月
+            <button id="lineChartTypeIncrement" class="chart-toggle-btn inactive" onclick="switchLineChartType('increment')">
+              增量
             </button>
           </div>
         </div>
@@ -631,16 +675,16 @@
           </div>
         </div>
       </div>
-      
-      <!-- 采购单 -->
+        
+        <!-- 采购单 -->
       <div id="poModule" class="module-card rounded-xl shadow-sm p-5 cursor-pointer flex flex-col" style="min-height: 260px;" onclick="navigateTo('po-list')">
-        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <div class="module-icon bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-sm">
               <i class="fas fa-file-invoice"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800">采购单</h3>
           </div>
+            <h3 class="text-lg font-bold text-gray-800">采购单</h3>
+            </div>
           <a href="#" class="view-all-link text-sm text-primary font-medium" onclick="event.stopPropagation()">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
         </div>
         <div class="space-y-2.5 flex-1 flex flex-col justify-center">
@@ -672,20 +716,20 @@
             </div>
             <span class="data-number text-lg font-bold text-red-600" id="poRejected">3</span>
           </div>
+          </div>
         </div>
-      </div>
-      
-      <!-- 订单管理 -->
+        
+        <!-- 订单管理 -->
       <div class="module-card rounded-xl shadow-sm p-5 flex flex-col" style="min-height: 260px;">
-        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <div class="module-icon bg-gradient-to-br from-green-500 to-green-600 text-white shadow-sm">
               <i class="fas fa-shopping-bag"></i>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800">订单管理</h3>
           </div>
+            <h3 class="text-lg font-bold text-gray-800">订单管理</h3>
+            </div>
           <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
-        </div>
+            </div>
         <div class="space-y-2.5 flex-1 flex flex-col justify-center">
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer">
             <div class="flex items-center gap-2">
@@ -698,7 +742,7 @@
             <div class="flex items-center gap-2">
               <i class="fas fa-truck-loading text-orange-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">待发货</span>
-            </div>
+        </div>
             <span class="data-number text-lg font-bold text-orange-600" id="orderShipping">12</span>
           </div>
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-green-50 rounded-lg cursor-pointer">
@@ -739,17 +783,17 @@
           <div class="flex items-center gap-3">
             <div class="module-icon bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm">
               <i class="fas fa-undo"></i>
-            </div>
+        </div>
             <h3 class="text-lg font-bold text-gray-800">售后管理</h3>
           </div>
           <a href="after_sales/after_sales_buyer.html" class="view-all-link text-sm text-primary font-medium" onclick="event.stopPropagation()">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
-        </div>
+          </div>
         <div class="space-y-2.5">
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-yellow-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=pending'">
             <div class="flex items-center gap-2">
               <i class="fas fa-question-circle text-yellow-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">待确认</span>
-            </div>
+          </div>
             <span class="data-number text-lg font-bold text-yellow-600" id="afterSaleConfirm">3</span>
           </div>
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-orange-50 rounded-lg cursor-pointer" onclick="event.stopPropagation(); window.location.href='after_sales/after_sales_buyer.html?tab=return'">
@@ -792,17 +836,17 @@
           <div class="flex items-center gap-3">
             <div class="module-icon bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-sm">
               <i class="fas fa-file-signature"></i>
-            </div>
+        </div>
             <h3 class="text-lg font-bold text-gray-800">合同签署</h3>
           </div>
           <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
-        </div>
+          </div>
         <div class="space-y-2.5">
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-gray-100 rounded-lg cursor-pointer">
             <div class="flex items-center gap-2">
               <i class="fas fa-edit text-gray-500 text-sm"></i>
               <span class="text-sm font-medium text-gray-700">待提交</span>
-            </div>
+          </div>
             <span class="data-number text-lg font-bold text-gray-600" id="contractSubmit">6</span>
           </div>
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-blue-50 rounded-lg cursor-pointer">
@@ -835,11 +879,11 @@
           <div class="flex items-center gap-3">
             <div class="module-icon bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-sm">
               <i class="fas fa-calculator"></i>
-            </div>
+        </div>
             <h3 class="text-lg font-bold text-gray-800">结算订单</h3>
           </div>
           <a href="#" class="view-all-link text-sm text-primary font-medium">查看全部 <i class="fas fa-chevron-right text-xs ml-1"></i></a>
-        </div>
+          </div>
         <div class="space-y-2.5">
           <!-- 第一行：待提交 -->
           <div class="data-row flex items-center justify-between py-2.5 px-4 bg-yellow-50 rounded-lg cursor-pointer">
@@ -919,24 +963,24 @@
           
       <!-- 商品网格（8列布局，占满整行） -->
       <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-          
+            
           <!-- 商品1：A4纸（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
+              <div class="relative">
               <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=320&h=180&fit=crop" alt="A4纸" class="product-img-small">
               <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
                 <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
+                </button>
+              </div>
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">得力A4复印纸</h3>
               <span class="text-xs font-bold text-primary">¥28.50</span>
+              </div>
             </div>
-          </div>
-          
+            
           <!-- 商品2：打印机（下架） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer opacity-75">
-            <div class="relative">
+              <div class="relative">
               <img src="https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=320&h=180&fit=crop" alt="打印机" class="product-img-small">
               <div class="product-disabled-overlay">
                 <div class="product-disabled-badge">
@@ -946,12 +990,12 @@
               </div>
               <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all z-10">
                 <i class="fas fa-heart text-gray-400 text-xs"></i>
-              </button>
-            </div>
+                </button>
+              </div>
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-500 mb-0.5 line-clamp-1">惠普一体机</h3>
               <span class="text-xs font-bold text-gray-400 line-through">¥1,299</span>
-            </div>
+                </div>
           </div>
           
           <!-- 商品3：订书机（正常） -->
@@ -965,21 +1009,21 @@
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">晨光订书机</h3>
               <span class="text-xs font-bold text-primary">¥12.80</span>
+              </div>
             </div>
-          </div>
-          
+            
           <!-- 商品4：显示屏（正常） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer">
-            <div class="relative">
+              <div class="relative">
               <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=320&h=180&fit=crop" alt="显示屏" class="product-img-small">
               <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all">
                 <i class="fas fa-heart text-primary text-xs"></i>
-              </button>
-            </div>
+                </button>
+              </div>
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">戴尔显示器</h3>
               <span class="text-xs font-bold text-primary">¥899</span>
-            </div>
+                </div>
           </div>
           
           <!-- 商品5：键盘（正常） -->
@@ -993,12 +1037,12 @@
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">机械键盘</h3>
               <span class="text-xs font-bold text-primary">¥299</span>
+              </div>
             </div>
-          </div>
-          
+            
           <!-- 商品6：鼠标（下架） -->
           <div class="product-card bg-white rounded-lg overflow-hidden cursor-pointer opacity-75">
-            <div class="relative">
+              <div class="relative">
               <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?w=320&h=180&fit=crop" alt="鼠标" class="product-img-small">
               <div class="product-disabled-overlay">
                 <div class="product-disabled-badge">
@@ -1008,12 +1052,12 @@
               </div>
               <button class="absolute top-1 right-1 w-5 h-5 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white shadow-sm transition-all z-10">
                 <i class="fas fa-heart text-gray-400 text-xs"></i>
-              </button>
-            </div>
+                </button>
+              </div>
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-500 mb-0.5 line-clamp-1">无线鼠标</h3>
               <span class="text-xs font-bold text-gray-400 line-through">¥89</span>
-            </div>
+                </div>
           </div>
           
           <!-- 商品7：文件夹（正常） -->
@@ -1027,17 +1071,17 @@
             <div class="p-1.5">
               <h3 class="text-xs font-medium text-gray-800 mb-0.5 line-clamp-1">A4文件夹</h3>
               <span class="text-xs font-bold text-primary">¥15.90</span>
+              </div>
             </div>
-          </div>
-          
+            
           <!-- 查看更多卡片 -->
           <div class="view-more-card rounded-lg cursor-pointer" onclick="navigateTo('favorites')">
             <div class="flex flex-col items-center justify-center gap-2 py-2">
               <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                 <i class="fas fa-chevron-right text-gray-400 text-lg"></i>
-              </div>
+          </div>
               <span class="text-xs font-medium text-gray-600">查看更多</span>
-            </div>
+        </div>
           </div>
           
       </div>
@@ -1227,8 +1271,9 @@
     let lineChart = null;
     let pieChart = null;
     let lineChartType = 'total'; // 'total' 或 'increment'
-    let lineChartPeriod = 'day'; // 'day', 'week', 'month'
+    let lineChartPeriod = 'day'; // 'day', 'week', 'month', 'custom'
     let pieChartPeriod = 'month'; // 'month', 'year', 'all'
+    let customDateRange = null; // { start: Date, end: Date } 或 null
     
     // ========== Mock 数据生成 ==========
     function generateLineChartData(type, period, role) {
@@ -1253,6 +1298,41 @@
           const date = new Date();
           date.setMonth(date.getMonth() - i);
           data.labels.push(`${date.getMonth() + 1}月`);
+        }
+      } else if (period === 'custom' && customDateRange) {
+        // 自定义日期范围：按天生成标签
+        const start = new Date(customDateRange.start);
+        const end = new Date(customDateRange.end);
+        const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        
+        // 如果日期范围太大（超过90天），按周显示；如果超过365天，按月显示
+        if (daysDiff > 365) {
+          // 按月显示
+          const startMonth = new Date(start.getFullYear(), start.getMonth(), 1);
+          const endMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0);
+          let current = new Date(startMonth);
+          
+          while (current <= endMonth) {
+            data.labels.push(`${current.getMonth() + 1}月`);
+            current.setMonth(current.getMonth() + 1);
+          }
+        } else if (daysDiff > 90) {
+          // 按周显示
+          let current = new Date(start);
+          let weekCount = 0;
+          
+          while (current <= end) {
+            weekCount++;
+            data.labels.push(`第${weekCount}周`);
+            current.setDate(current.getDate() + 7);
+          }
+        } else {
+          // 按天显示
+          let current = new Date(start);
+          while (current <= end) {
+            data.labels.push(`${current.getMonth() + 1}-${current.getDate()}`);
+            current.setDate(current.getDate() + 1);
+          }
         }
       }
       
@@ -1395,7 +1475,8 @@
     }
     
     function switchLineChartPeriod(period) {
-      lineChartPeriod = period;
+      const datePicker = document.getElementById('customDatePicker');
+      const customBtn = document.getElementById('lineChartPeriodCustom');
       
       // 更新按钮状态
       document.getElementById('lineChartPeriodDay').className = 
@@ -1404,6 +1485,97 @@
         period === 'week' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
       document.getElementById('lineChartPeriodMonth').className = 
         period === 'month' ? 'chart-toggle-btn active' : 'chart-toggle-btn inactive';
+      
+      if (period === 'custom') {
+        // 自定义模式：显示内联选择器，按钮变蓝
+        if (customBtn) {
+          customBtn.className = 'chart-toggle-btn active';
+        }
+        if (datePicker) {
+          // 如果选择器已显示，则隐藏它；否则显示它
+          if (datePicker.classList.contains('hidden')) {
+            datePicker.classList.remove('hidden');
+            
+            // 如果已有自定义日期范围，使用它；否则设置默认日期（最近30天）
+            const startInput = document.getElementById('customDateStart');
+            const endInput = document.getElementById('customDateEnd');
+            
+            if (startInput && endInput) {
+              if (customDateRange) {
+                startInput.value = formatDateForInput(customDateRange.start);
+                endInput.value = formatDateForInput(customDateRange.end);
+              } else {
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+                startInput.value = formatDateForInput(startDate);
+                endInput.value = formatDateForInput(endDate);
+              }
+            }
+          } else {
+            // 如果选择器已显示，再次点击时隐藏它（但保持自定义模式）
+            datePicker.classList.add('hidden');
+          }
+        }
+        
+        // 如果已有自定义日期范围，更新图表；否则不更新（等待用户选择日期）
+        if (customDateRange) {
+          lineChartPeriod = 'custom';
+          renderLineChart();
+        }
+        return; // 如果没有自定义日期范围，不立即渲染图表
+      } else {
+        // 其他模式：隐藏内联选择器，重置自定义按钮
+        if (datePicker) {
+          datePicker.classList.add('hidden');
+        }
+        if (customBtn) {
+          customBtn.className = 'chart-toggle-btn inactive';
+        }
+        customDateRange = null; // 清除自定义日期范围
+        
+        lineChartPeriod = period;
+        // 重新渲染图表
+        renderLineChart();
+      }
+    }
+    
+    function formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    function applyCustomDate() {
+      const startInput = document.getElementById('customDateStart');
+      const endInput = document.getElementById('customDateEnd');
+      
+      if (!startInput || !endInput) return;
+      
+      const startDate = new Date(startInput.value);
+      const endDate = new Date(endInput.value);
+      
+      // 验证日期
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        alert('请选择有效的日期');
+        return;
+      }
+      
+      if (startDate > endDate) {
+        alert('开始日期不能晚于结束日期');
+        return;
+      }
+      
+      // 保存自定义日期范围
+      customDateRange = { start: startDate, end: endDate };
+      lineChartPeriod = 'custom';
+      
+      // 隐藏日期选择器（保持自定义按钮为激活状态）
+      const datePicker = document.getElementById('customDatePicker');
+      if (datePicker) {
+        datePicker.classList.add('hidden');
+      }
       
       // 重新渲染图表
       renderLineChart();
