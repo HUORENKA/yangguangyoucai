@@ -1,4 +1,4 @@
-// 阳光优采 - 管理后台运营数据 Mock 数据
+// 阳光甄选 - 管理后台运营数据 Mock 数据
 // 用于原型演示，所有数据均为模拟数据
 
 const dashboardData = {
@@ -180,7 +180,10 @@ const storeDetailData = {
   openTime: '',
   isFollowed: false,
   categories: [],
-  products: []
+  products: [],
+  storeInfo: { companyName: '', contactPhone: '' },
+  serviceScope: '',
+  businessLicense: { creditCode: '', registeredCapital: '', companyName: '', companyAddress: '' }
 };
 
 // 初始化店铺列表数据（10个店铺，每个5个推荐商品）
@@ -382,6 +385,18 @@ function initStoreDetailData(storeId) {
   storeDetailData.isFollowed = store.isFollowed;
   storeDetailData.categories = categories;
   storeDetailData.products = products;
+  
+  storeDetailData.storeInfo = {
+    companyName: store.name + '（供应商主体）',
+    contactPhone: '400-820-8056'
+  };
+  storeDetailData.serviceScope = '许可项目：食品销售；道路货物运输(不含危险货物)；出版物零售；包装装潢印刷品印刷；第一类增值电信业务；第二类增值电信业务；第三类医疗器械经营；危险化学品经营；医疗器械互联网信息服务。(依法须经批准的项目，经相关部门批准后方可开展经营活动，具体经营项目以相关部门批准文件或许可证件为准)\n\n一般项目：计算机软硬件及辅助设备批发；通讯设备销售；五金产品批发；家用电器销售；电子产品销售；办公设备销售；家具销售；纸制品销售；日用百货销售；文具用品批发；办公设备耗材销售；技术服务、技术开发、技术咨询；货物进出口；技术进出口。';
+  storeDetailData.businessLicense = {
+    creditCode: '91310000717852665A',
+    registeredCapital: '125154.83万元',
+    companyName: store.name + '（供应商主体）',
+    companyAddress: '上海市长宁区通协路269号5号楼3楼'
+  };
   
   return storeDetailData;
 }
@@ -619,7 +634,7 @@ function initHomePageData() {
   // ---------- 推广轮播页（16:9 比例，接入真实商城促销图） ----------
   homePageData.carousel = [
     { id: 'c1', image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=675&fit=crop', title: '年终大促', subTitle: '全场满减 · 限时特惠', tag: '促销', link: '#', sortOrder: 1 },
-    { id: 'c2', image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200&h=675&fit=crop', title: '阳光优采平台', subTitle: '依托一物一码 · 比质比价新模式', tag: '平台', link: '#', sortOrder: 2 },
+    { id: 'c2', image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200&h=675&fit=crop', title: '阳光甄选平台', subTitle: '依托一物一码 · 比质比价新模式', tag: '平台', link: '#', sortOrder: 2 },
     { id: 'c3', image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&h=675&fit=crop', title: '办公用品专区', subTitle: '办公耗材 · 电脑数码 低至5折', tag: '专区', link: '#', sortOrder: 3 },
     { id: 'c4', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&h=675&fit=crop', title: '个人防护专场', subTitle: '20+高危场景防护指南', tag: '防护', link: '#', sortOrder: 4 }
   ];
