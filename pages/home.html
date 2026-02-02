@@ -21,7 +21,9 @@
     
     .product-card {
       display: flex; flex-direction: column; transition: all 0.25s ease; border: 1px solid #e5e7eb;
+      aspect-ratio: 4/5; overflow: hidden;
     }
+    .product-card img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
     .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #E2231A; }
     .product-card > a { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .product-card > a .reco-card-top { flex: 1; min-height: 0; }
@@ -36,10 +38,10 @@
     .cat-item:hover { background: #ffebe9; color: #E2231A; }
     .cat-item.active { background: #ffebe9; color: #E2231A; font-weight: 600; border-left: 3px solid #E2231A; }
     
-    .reco-panel { background: #4a5568; color: #fff; min-height: 320px; }
+    .reco-panel { background: #4a5568; color: #fff; min-height: 380px; }
     .reco-panel.sec2 { background: #6b5b4f; }
     .reco-panel.sec3 { background: #4a6b5c; }
-    .reco-section { min-height: 320px; }
+    .reco-section { min-height: 380px; }
     .tab-2nd { transition: all 0.2s; }
     .tab-2nd.active { background: #E2231A; color: #fff; }
     .tab-2nd:not(.active) { background: #f3f4f6; color: #374151; }
@@ -753,7 +755,7 @@
     <!-- 分类推荐 1：办公用品 电脑数码 -->
     <section class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4 reco-section">
       <div class="font-semibold text-gray-900 px-4 py-3 border-b border-gray-100">分类推荐</div>
-      <div class="flex min-h-[300px]">
+      <div class="flex min-h-[380px]">
         <div class="reco-panel w-56 shrink-0 flex flex-col justify-between p-4">
           <div>
             <h3 class="text-lg font-bold text-white mb-2">办公用品 电脑数码</h3>
@@ -770,8 +772,8 @@
             <button type="button" class="tab-2nd px-4 py-2 rounded text-sm" data-block="0" data-tab="write">书写/修正用品</button>
             <a href="#" class="ml-auto px-4 py-2 text-primary text-sm font-medium hover:underline" onclick="return false;">查看更多</a>
           </div>
-          <div class="grid grid-cols-5 gap-3" id="recoProducts0">
-            <!-- 5 个商品卡片由 JS 渲染 -->
+          <div class="grid grid-cols-4 gap-3" id="recoProducts0">
+            <!-- 4 个商品卡片由 JS 渲染 -->
           </div>
         </div>
       </div>
@@ -779,7 +781,7 @@
     
     <!-- 分类推荐 2：个人防护 安全防护 -->
     <section class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4 reco-section">
-      <div class="flex min-h-[300px]">
+      <div class="flex min-h-[380px]">
         <div class="reco-panel sec2 w-56 shrink-0 flex flex-col justify-between p-4">
           <div>
             <h3 class="text-lg font-bold text-white mb-2">个人防护 安全防护</h3>
@@ -796,8 +798,8 @@
             <button type="button" class="tab-2nd px-4 py-2 rounded text-sm" data-block="1" data-tab="road">道路安全</button>
             <a href="#" class="ml-auto px-4 py-2 text-primary text-sm font-medium hover:underline" onclick="return false;">查看更多</a>
           </div>
-          <div class="grid grid-cols-5 gap-3" id="recoProducts1">
-            <!-- 5 个商品卡片由 JS 渲染 -->
+          <div class="grid grid-cols-4 gap-3" id="recoProducts1">
+            <!-- 4 个商品卡片由 JS 渲染 -->
           </div>
         </div>
       </div>
@@ -805,7 +807,7 @@
 
     <!-- 分类推荐 3：工具耗材 机床数控 -->
     <section class="bg-white rounded-lg border border-gray-200 overflow-hidden reco-section">
-      <div class="flex min-h-[300px]">
+      <div class="flex min-h-[380px]">
         <div class="reco-panel sec3 w-56 shrink-0 flex flex-col justify-between p-4">
           <div>
             <h3 class="text-lg font-bold text-white mb-2">工具耗材 机床数控</h3>
@@ -822,8 +824,8 @@
             <button type="button" class="tab-2nd px-4 py-2 rounded text-sm" data-block="2" data-tab="measure">测量工具</button>
             <a href="#" class="ml-auto px-4 py-2 text-primary text-sm font-medium hover:underline" onclick="return false;">查看更多</a>
           </div>
-          <div class="grid grid-cols-5 gap-3" id="recoProducts2">
-            <!-- 5 个商品卡片由 JS 渲染 -->
+          <div class="grid grid-cols-4 gap-3" id="recoProducts2">
+            <!-- 4 个商品卡片由 JS 渲染 -->
           </div>
         </div>
       </div>
@@ -1239,53 +1241,14 @@
     
     function getProductByBlockIndex(block, tab) {
       const d = recoMock[block];
-      if (tab === 'all' || !d[tab]) return d.all.slice(0, 5);
-      return d[tab].map(id => d.all.find(p => p.id === id)).filter(Boolean).slice(0, 5);
+      if (tab === 'all' || !d[tab]) return d.all.slice(0, 4);
+      return d[tab].map(id => d.all.find(p => p.id === id)).filter(Boolean).slice(0, 4);
     }
     
     function renderProductCard(p, blockId) {
-      var price = Number(p.price) || 0;
-      var refPrice = (p.ref != null && p.ref !== '') ? Number(p.ref) : price;
-      var minPrice = (p.min != null && p.min !== '') ? Number(p.min) : (refPrice * 0.6);
-      if (refPrice <= minPrice) refPrice = minPrice + 1;
-      var range = refPrice - minPrice;
-      var pricePercent;
-      if (price <= minPrice) pricePercent = 0;
-      else if (price <= refPrice) pricePercent = ((price - minPrice) / range) * 80;
-      else pricePercent = Math.min(100, 80 + ((price - refPrice) / (range * 0.25)) * 20);
-      var evalText = getPriceEvaluation(price, minPrice, refPrice);
       var bid = (blockId != null ? blockId : 0);
-      return `<div class="product-card rounded-lg p-3 bg-white" data-product-id="${p.id}" data-block-id="${bid}">
-        <a href="store/store_detail.html?id=${p.id}" class="block" onclick="event.stopPropagation()">
-          <div class="reco-card-top">
-            <div class="aspect-[16/10] rounded overflow-hidden bg-gray-100 mb-2"><img src="${p.img}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
-            <div class="text-gray-900 text-sm line-clamp-2 leading-snug mb-1">${p.name}</div>
-            <div class="reco-card-price-row text-primary font-semibold">
-              <span>¥${price.toFixed(2)} 元/${p.unit}</span>
-              <span class="reco-card-price-tag">合规</span>
-            </div>
-            <div class="text-xs text-gray-500 mb-1 reco-card-supplier" title="${(p.supplier || '').replace(/"/g, '&quot;')}"><i class="fas fa-crown text-amber-500 mr-1"></i>${p.supplier}</div>
-          </div>
-          <div class="price-rational-wrap">
-            <div class="price-rational-bar-container">
-              <div class="price-rational-label ${evalText === '价格偏高' ? 'high' : ''}" style="left:${pricePercent}%">${evalText}</div>
-              <div class="price-rational-bar-wrap">
-                <div class="price-rational-bar-green"></div>
-                <div class="price-rational-bar-red"></div>
-                <div class="price-rational-dot price-rational-dot-min"></div>
-                <div class="price-rational-dot price-rational-dot-ref"></div>
-                <div class="price-rational-dot price-rational-dot-price" style="left:${pricePercent}%"></div>
-              </div>
-              <div class="price-rational-labels">
-                <span class="left">¥${minPrice.toFixed(2)}</span>
-                <span class="right">¥${refPrice.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-        </a>
-        <div class="reco-card-actions">
-          <button type="button" class="btn-compare" onclick="event.preventDefault();event.stopPropagation();openCompareModal(this)"><i class="fas fa-balance-scale"></i> AI比质比价</button>
-        </div>
+      return `<div class="product-card rounded-lg overflow-hidden bg-white border border-gray-200" data-product-id="${p.id}" data-block-id="${bid}">
+        <img src="picture/商品卡片.png" alt="商品卡片" loading="lazy">
       </div>`;
     }
     
