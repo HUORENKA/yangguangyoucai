@@ -196,6 +196,67 @@
       color: #64748b;
     }
     
+    #aiInquiryBody {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    .ai-compare-result-panel {
+      flex: 1;
+      min-height: 0;
+    }
+    .ai-compare-result-panel .ai-util-panel-body {
+      overflow-y: auto;
+    }
+    
+    /* 商品比较列表页：AI分析按钮区 */
+    .ai-compare-ai-section {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .ai-compare-ai-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-right: 12px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .ai-compare-ai-btns {
+      display: inline-flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ai-compare-ai-btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ai-compare-ai-btn:hover {
+      color: var(--color-primary);
+      border-color: var(--color-primary-border);
+      background: var(--color-primary-bg);
+    }
+    .ai-compare-ai-result {
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.6;
+      min-height: 60px;
+    }
+    
     /* 左侧：AI对话导购 */
     .ai-chat-panel {
       flex: 0 0 30%;
@@ -1633,10 +1694,14 @@
       background: #bfdbfe;
     }
     
-    /* AI询价：价格折线图区域 */
+    /* AI询价：柱状图区域（占满模块可用空间） */
     .ai-inquiry-chart-wrap {
       position: relative;
-      margin-bottom: 12px;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0;
     }
     
     .ai-inquiry-chart-ref {
@@ -1658,11 +1723,12 @@
     
     .ai-inquiry-chart {
       width: 100%;
-      height: 160px;
+      flex: 1;
+      min-height: 140px;
       background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
       border-radius: 8px;
       border: 1px solid #e2e8f0;
-      padding: 12px 12px 24px;
+      padding: 10px 10px 16px;
       box-sizing: border-box;
     }
     
@@ -1672,11 +1738,78 @@
       display: block;
     }
     
+    .ai-inquiry-chart .inquiry-bar-group {
+      cursor: pointer;
+    }
+    
+    .ai-inquiry-chart .inquiry-bar-group:hover {
+      opacity: 0.9;
+    }
+    
+    .ai-inquiry-tooltip {
+      position: fixed;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #fff;
+      background: rgba(0,0,0,0.8);
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 100;
+      max-width: 200px;
+      line-height: 1.4;
+      display: none;
+    }
+    
+    .ai-inquiry-price-desc {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.8;
+      padding: 16px 14px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ai-inquiry-price-desc .line {
+      display: block;
+    }
+    .ai-inquiry-price-desc strong {
+      color: var(--color-primary);
+    }
+    .ai-inquiry-price-desc .below {
+      color: #059669;
+    }
+    .ai-inquiry-price-desc .above {
+      color: #dc2626;
+    }
+    
     .ai-inquiry-placeholder {
       font-size: 13px;
       color: #64748b;
       text-align: center;
       padding: 20px 12px;
+    }
+    
+    /* 综合分析：商品色点（与 AI 询价柱状图颜色一致，最多 9 色） */
+    .ai-product-color-dot {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .ai-product-card-name-wrap {
+      display: flex;
+      align-items: center;
+      min-height: 0;
+    }
+    .ai-product-card-name-wrap .ai-product-card-name {
+      flex: 1;
+      min-width: 0;
     }
   </style>
 </head>
@@ -1768,7 +1901,7 @@
       </div>
     </section>
     
-    <!-- 右侧：AI寻源 + AI询价 -->
+    <!-- 右侧：AI寻源 + AI询价；或 比质比价结果（分析页面五）替代 -->
     <div class="ai-right-column">
       <section class="ai-util-panel" id="aiSourcingPanel">
         <div class="ai-util-panel-header"><i class="fas fa-search-plus"></i> AI寻源 <span class="ai-page-hint" id="sourcingPageHint">寻源页面一</span></div>
@@ -1777,6 +1910,10 @@
       <section class="ai-util-panel" id="aiInquiryPanel">
         <div class="ai-util-panel-header"><i class="fas fa-file-invoice-dollar"></i> AI询价</div>
         <div class="ai-util-panel-body" id="aiInquiryBody">询价记录与报价结果将在此展示。</div>
+      </section>
+      <section class="ai-util-panel ai-compare-result-panel" id="aiCompareResultPanel" style="display: none;">
+        <div class="ai-util-panel-header"><i class="fas fa-chart-bar"></i> 比质比价结果</div>
+        <div class="ai-util-panel-body" id="aiCompareResultBody"></div>
       </section>
     </div>
       </div>
@@ -1865,6 +2002,9 @@
   <script>
     // ==================== Mock 数据 ====================
     // ==================== 分类数据 ====================
+    // 综合分析 / AI 询价：最多 9 个商品对应 9 种颜色（色点与柱状图一致）
+    var PRODUCT_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
+    
     const mockCategories = {
       '办公用品': {
         children: {
@@ -1901,6 +2041,12 @@
       { id: 10, name: '霍尼韦尔 绝缘手套 10KV', brand: '霍尼韦尔', price: 89.00, unit: '双', sales: 2100, score: 4.7, img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop', cat1: '劳保用品', cat2: '手部防护', cat3: '绝缘手套', supplierId: 3 },
       { id: 11, name: '3M 防尘面罩 半面罩', brand: '3M', price: 68.00, unit: '个', sales: 3200, score: 4.6, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&h=300&fit=crop', cat1: '劳保用品', cat2: '呼吸防护', cat3: '防尘面罩', supplierId: 2 },
       { id: 12, name: '得力 圆珠笔 0.7mm 蓝色 50支/盒', brand: '得力', price: 18.00, unit: '盒', sales: 7500, score: 4.5, img: 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '文具', cat3: '圆珠笔', supplierId: 5 },
+      { id: 13, name: '亚太森博 A4复印纸 70g 500张/包', brand: '亚太森博', price: 24.50, unit: '包', sales: 4100, score: 4.6, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 1 },
+      { id: 14, name: '金丝雀 A4复印纸 70g 白色 500张/包', brand: '金丝雀', price: 27.20, unit: '包', sales: 3800, score: 4.5, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 4 },
+      { id: 15, name: 'Double A A4复印纸 70g 500张/包', brand: 'Double A', price: 29.80, unit: '包', sales: 5200, score: 4.8, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 2 },
+      { id: 16, name: '百旺 A4复印纸 70g 5包/箱', brand: '百旺', price: 25.20, unit: '箱', sales: 6100, score: 4.7, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 5 },
+      { id: 17, name: '传美 A4复印纸 70g 500张/包', brand: '传美', price: 22.90, unit: '包', sales: 2900, score: 4.4, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 6 },
+      { id: 18, name: '汇东 A4复印纸 70g 办公用 500张/包', brand: '汇东', price: 26.50, unit: '包', sales: 3400, score: 4.6, img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop', cat1: '办公用品', cat2: '复印纸', cat3: 'A4 70g', supplierId: 3 },
     ];
     
     const mockReviews = {
@@ -2076,6 +2222,8 @@
     var currentCat3 = '';
     var compareSourceProductId = null; // 从哪个商品进入比质比价（分析页面四）
     var comparePage4SelectedIds = { same: [], similar: [] }; // 分析页面四两个 Tab 下勾选的 id
+    var inquiryChartProducts = []; // 当前 AI 询价柱状图对应的商品列表（用于详情页时保留图表并高亮当前商品）
+    var lastRightColumnProducts = []; // 分析页面四时右侧栏商品列表，用于从分析页面五返回后恢复 AI寻源/AI询价
     
     // 更新智能分析 / AI寻源 的页面提示标签（原型演示用）；空字符串时不展示标签
     function updatePageHints(analysisHint, sourcingHint) {
@@ -2371,14 +2519,18 @@
       updateSourcingAndInquiry(products);
     }
     
-    // 渲染商品卡片（分析页面一/二：无复选框，悬停层含比质比价按钮）
+    // 渲染商品卡片（分析页面一/二：无复选框，悬停层含比质比价按钮；带色点与 AI 询价柱状图对应）
     function renderProductCards(products) {
-      return products.map(function(p) {
+      return products.map(function(p, i) {
         var nameEsc = p.name.replace(/'/g, "\\'");
+        var dotColor = PRODUCT_COLORS[i % PRODUCT_COLORS.length];
         return `
           <div class="ai-product-card" id="productCard_${p.id}">
             <img src="${p.img}" class="ai-product-card-img" alt="">
-            <div class="ai-product-card-name">${p.name}</div>
+            <div class="ai-product-card-name-wrap">
+              <span class="ai-product-color-dot" style="background:${dotColor}"></span>
+              <div class="ai-product-card-name">${p.name}</div>
+            </div>
             <div class="ai-product-card-supplier-name">${p.brand}</div>
             <div class="ai-product-card-meta">
               <span class="ai-product-card-price">¥${p.price.toFixed(2)}/${p.unit}</span>
@@ -2405,17 +2557,21 @@
       renderAnalysisPage4();
     }
     
-    // 分析页面四：Tab 下商品带勾选框的渲染（仅页面四使用）
+    // 分析页面四：Tab 下商品带勾选框的渲染（仅页面四使用；带色点）
     function renderPage4ProductCards(products, tabKey) {
-      return products.map(function(p) {
+      return products.map(function(p, i) {
         var nameEsc = p.name.replace(/'/g, "\\'");
         var checked = (comparePage4SelectedIds[tabKey] || []).indexOf(p.id) >= 0 ? ' checked' : '';
         var selectedClass = (comparePage4SelectedIds[tabKey] || []).indexOf(p.id) >= 0 ? ' selected' : '';
+        var dotColor = PRODUCT_COLORS[i % PRODUCT_COLORS.length];
         return `
           <div class="ai-product-card${selectedClass}" id="page4Card_${tabKey}_${p.id}">
             <label class="ai-product-card-checkbox"><input type="checkbox" ${checked} onchange="togglePage4Select('${tabKey}', ${p.id}, this.checked)"></label>
             <img src="${p.img}" class="ai-product-card-img" alt="">
-            <div class="ai-product-card-name">${p.name}</div>
+            <div class="ai-product-card-name-wrap">
+              <span class="ai-product-color-dot" style="background:${dotColor}"></span>
+              <div class="ai-product-card-name">${p.name}</div>
+            </div>
             <div class="ai-product-card-supplier-name">${p.brand}</div>
             <div class="ai-product-card-meta">
               <span class="ai-product-card-price">¥${p.price.toFixed(2)}/${p.unit}</span>
@@ -2490,85 +2646,96 @@
       document.getElementById('aiSourcingBody').innerHTML = html;
     }
     
-    // AI询价：双轴线（最高价、最低价）
-    function renderInquiryChartDual(products) {
+    // AI询价：柱状图（纵轴价格，横轴商品；悬停显示商品名；点击跳转综合分析商品详情；详情页时保留图表并高亮当前柱、其余灰）
+    function renderInquiryChartDual(products, highlightProductId) {
+      if (!products || products.length === 0) {
+        products = mockProducts.slice(0, 3);
+      }
+      inquiryChartProducts = products.slice(0, 9);
       var prices = products.map(function(p) { return p.price; });
-      if (prices.length === 0) prices = [25, 28, 30];
       var minPrice = Math.min.apply(null, prices);
       var maxPrice = Math.max.apply(null, prices);
-      var refPrice = ((minPrice + maxPrice) / 2).toFixed(2);
+      var range = maxPrice - minPrice || 1;
+      var minV = minPrice - range * 0.1;
+      var maxV = maxPrice + range * 0.1;
+      var rangeV = maxV - minV;
+      var refPrice = (minPrice + maxPrice) / 2;
       
-      // 生成 7 天最高价/最低价数据
-      var historyMax = [];
-      var historyMin = [];
-      for (var i = 6; i >= 0; i--) {
-        var d = new Date();
-        d.setDate(d.getDate() - i);
-        var dateStr = (d.getMonth()+1) + '/' + d.getDate();
-        var baseMax = maxPrice + (Math.random() - 0.5) * 3;
-        var baseMin = minPrice + (Math.random() - 0.5) * 2;
-        if (baseMin > baseMax) baseMin = baseMax - 1;
-        historyMax.push({ date: dateStr, value: Math.round(baseMax * 100) / 100 });
-        historyMin.push({ date: dateStr, value: Math.round(baseMin * 100) / 100 });
+      var w = 260;
+      var h = 200;
+      var padding = { left: 42, right: 10, top: 10, bottom: 20 };
+      var chartW = w - padding.left - padding.right;
+      var chartH = h - padding.top - padding.bottom;
+      var n = Math.min(products.length, 9);
+      var slotW = chartW / n;
+      var barW = Math.max(14, slotW * 0.55);
+      var barGap = (slotW - barW) / 2;
+      var grayFill = '#cbd5e1';
+      
+      var barsHtml = products.slice(0, 9).map(function(p, i) {
+        var isHighlight = highlightProductId == null || p.id === highlightProductId;
+        var color = isHighlight ? PRODUCT_COLORS[i % PRODUCT_COLORS.length] : grayFill;
+        var barH = ((p.price - minV) / rangeV) * chartH;
+        var x = padding.left + i * slotW + barGap;
+        var y = padding.top + chartH - barH;
+        var nameEsc = (p.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return '<g class="inquiry-bar-group" onclick="onInquiryBarClick(' + p.id + ')" style="cursor:pointer"><title>' + nameEsc + '</title>' +
+          '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + Math.max(2, barH) + '" fill="' + color + '" rx="4"/></g>';
+      }).join('');
+      
+      var yTicks = [minV, minV + rangeV * 0.5, maxV];
+      var yTicksHtml = yTicks.map(function(v) {
+        var y = padding.top + chartH - ((v - minV) / rangeV) * chartH;
+        return '<line x1="' + padding.left + '" y1="' + y + '" x2="' + (padding.left + chartW) + '" y2="' + y + '" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="2"/>' +
+          '<text x="' + (padding.left - 4) + '" y="' + (y + 4) + '" font-size="10" fill="#64748b" text-anchor="end">¥' + v.toFixed(0) + '</text>';
+      }).join('');
+      
+      var refY = padding.top + chartH - ((refPrice - minV) / rangeV) * chartH;
+      var refLineHtml = '<line x1="' + padding.left + '" y1="' + refY + '" x2="' + (padding.left + chartW) + '" y2="' + refY + '" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 2"/>' +
+        '<text x="' + (padding.left + chartW - 2) + '" y="' + (refY - 4) + '" font-size="10" fill="#f59e0b" text-anchor="end">采购上限价</text>';
+      
+      if (highlightProductId != null) {
+        var curProduct = products.find(function(p) { return p.id === highlightProductId; });
+        if (curProduct && refPrice > 0) {
+          var curPrice = curProduct.price;
+          var diff = refPrice - curPrice;
+          var pct = Math.abs((diff / refPrice) * 100).toFixed(1);
+          var refStr = refPrice.toFixed(2);
+          var curStr = curPrice.toFixed(2);
+          var nameEsc = (curProduct.name || '该商品').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          var line1 = nameEsc + ' 采购上限价：' + refStr + '元，当前商品价格：' + curStr + '元';
+          var line2;
+          if (diff > 0) {
+            line2 = '<span class="below">低于采购价 ' + diff.toFixed(2) + '元（' + pct + '%）</span>';
+          } else if (diff < 0) {
+            line2 = '<span class="above">高于采购价 ' + Math.abs(diff).toFixed(2) + '元（' + pct + '%）</span>';
+          } else {
+            line2 = '与采购上限价一致';
+          }
+          document.getElementById('aiInquiryBody').innerHTML = '<div class="ai-inquiry-price-desc"><span class="line">' + line1 + '</span><span class="line">' + line2 + '</span></div>';
+          return;
+        }
       }
-      
-      var w = 280;
-      var h = 140;
-      var padding = { top: 16, right: 12, bottom: 28, left: 40 };
-      var allVals = historyMax.map(function(d){ return d.value; }).concat(historyMin.map(function(d){ return d.value; }));
-      var minV = Math.min.apply(null, allVals);
-      var maxV = Math.max.apply(null, allVals);
-      var range = maxV - minV || 1;
-      minV = minV - range * 0.15;
-      maxV = maxV + range * 0.15;
-      var xScale = (w - padding.left - padding.right) / (historyMax.length - 1);
-      var yScale = (h - padding.top - padding.bottom) / (maxV - minV);
-      
-      function getPolyline(arr) {
-        return arr.map(function(d, i) {
-          var x = padding.left + i * xScale;
-          var y = padding.top + (maxV - d.value) * yScale;
-          return x + ',' + y;
-        }).join(' ');
-      }
-      
-      var pointsMax = getPolyline(historyMax);
-      var pointsMin = getPolyline(historyMin);
-      var labels = historyMax.map(function(d) { return d.date; });
       
       var html = `
         <div class="ai-inquiry-chart-wrap">
-          <span class="ai-inquiry-chart-ref">市场参考价 <strong>¥${refPrice}</strong></span>
-          <div class="ai-inquiry-chart" style="height: 180px;">
+          <div class="ai-inquiry-chart" style="height: ${h}px;">
             <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
-              <!-- 最高价线（红色） -->
-              <polyline fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${pointsMax}"/>
-              ${historyMax.map(function(d, i) {
-                var x = padding.left + i * xScale;
-                var y = padding.top + (maxV - d.value) * yScale;
-                return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="#ef4444"/>';
-              }).join('')}
-              <!-- 最低价线（蓝色） -->
-              <polyline fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${pointsMin}"/>
-              ${historyMin.map(function(d, i) {
-                var x = padding.left + i * xScale;
-                var y = padding.top + (maxV - d.value) * yScale;
-                return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="var(--color-primary)"/>';
-              }).join('')}
-              <!-- 日期标签 -->
-              ${labels.map(function(lab, i) {
-                var x = padding.left + i * xScale;
-                return '<text x="' + x + '" y="' + (h - 6) + '" font-size="10" fill="#94a3b8" text-anchor="middle">' + lab + '</text>';
-              }).join('')}
+              ${yTicksHtml}
+              ${barsHtml}
+              ${refLineHtml}
             </svg>
-          </div>
-          <div style="display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 12px; color: #64748b;">
-            <span><span style="display:inline-block;width:12px;height:3px;background:#ef4444;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>最高价</span>
-            <span><span style="display:inline-block;width:12px;height:3px;background:var(--color-primary);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>最低价</span>
           </div>
         </div>
       `;
       document.getElementById('aiInquiryBody').innerHTML = html;
+    }
+    
+    function onInquiryBarClick(productId) {
+      var product = mockProducts.find(function(p) { return p.id === productId; });
+      if (!product) return;
+      showProductDetail(product.name, false);
+      renderInquiryChartDual(inquiryChartProducts.length ? inquiryChartProducts : [product], productId);
     }
     
     // ==================== 比质比价（分析页面四/五） ====================
@@ -2606,7 +2773,9 @@
       `;
       document.getElementById('analysisContent').innerHTML = html;
       updatePageHints('分析页面四', '寻源页面一');
-      updateSourcingAndInquiry(sameSpecProducts.length ? sameSpecProducts : similarProducts);
+      var page4Products = sameSpecProducts.length ? sameSpecProducts : similarProducts;
+      lastRightColumnProducts = page4Products.slice();
+      updateSourcingAndInquiry(page4Products);
     }
     
     function switchPage4Tab(tabKey) {
@@ -2616,7 +2785,48 @@
       document.getElementById('page4TabContentSimilar').style.display = tabKey === 'similar' ? '' : 'none';
     }
     
-    // 分析页面五：比质比价结果页（占位符）
+    // 综合分析：商品比较列表页（点击智能分析后中间页展示）
+    function renderCompareListPage() {
+      var html = `
+        <div class="ai-reco-header">
+          <div class="ai-reco-header-left">
+            <div class="ai-section-title"><i class="fas fa-balance-scale"></i> 商品比较列表</div>
+          </div>
+          <button type="button" class="ai-reco-refresh" onclick="closeCompareResultPanel()"><i class="fas fa-arrow-left"></i> 返回</button>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <div style="padding: 50px 20px; text-align: center; background: #f8fafc; border-radius: 12px; border: 2px dashed #e2e8f0;">
+            <div style="font-size: 40px; color: #cbd5e1; margin-bottom: 12px;"><i class="fas fa-table"></i></div>
+            <div style="font-size: 14px; color: #64748b;">参数比较表格（占位）</div>
+          </div>
+        </div>
+        <div class="ai-compare-ai-section">
+          <span class="ai-compare-ai-label">AI分析</span>
+          <div class="ai-compare-ai-btns">
+            <button type="button" class="ai-compare-ai-btn" onclick="showCompareAiEval(\'产地\')">产地</button>
+            <button type="button" class="ai-compare-ai-btn" onclick="showCompareAiEval(\'商品尺寸\')">商品尺寸</button>
+            <button type="button" class="ai-compare-ai-btn" onclick="showCompareAiEval(\'克重\')">克重</button>
+          </div>
+          <div id="aiCompareEvalResult" class="ai-compare-ai-result">点击上方按钮查看对应参数的 AI 评价</div>
+        </div>
+      `;
+      document.getElementById('analysisContent').innerHTML = html;
+      updatePageHints('分析页面五', '');
+    }
+    
+    var compareAiEvalMock = {
+      '产地': '综合所选商品的产地信息，多数为国内知名产区，供应链稳定，品质有保障。建议优先考虑具备产地溯源标识的商品。',
+      '商品尺寸': '所选商品在尺寸规格上较为统一，均符合常见办公场景需求。若需定制尺寸，可联系供应商单独询价。',
+      '克重': '克重参数在同类商品中处于中上水平，满足日常使用强度。如需高克重规格，可筛选 80g 及以上选项。'
+    };
+    
+    function showCompareAiEval(paramKey) {
+      var el = document.getElementById('aiCompareEvalResult');
+      if (!el) return;
+      el.innerHTML = '<span style="color:var(--color-primary);margin-right:6px;"><i class="fas fa-robot"></i></span>' + (compareAiEvalMock[paramKey] || '暂无该参数的 AI 评价。');
+    }
+    
+    // 分析页面五：比质比价结果页（占位符），展示在右侧栏替代 AI寻源+AI询价
     function renderAnalysisPage5() {
       var ids = [];
       (comparePage4SelectedIds.same || []).forEach(function(id) { if (ids.indexOf(id) < 0) ids.push(id); });
@@ -2624,21 +2834,30 @@
       var products = mockProducts.filter(function(p) { return ids.indexOf(p.id) >= 0; });
       if (products.length === 0) products = mockProducts.slice(0, 3);
       var html = `
-        <div class="ai-reco-header">
-          <div class="ai-reco-header-left">
-            <div class="ai-section-title"><i class="fas fa-chart-bar"></i> 比质比价结果</div>
-          </div>
-          <button type="button" class="ai-reco-refresh" onclick="renderAnalysisPage4()"><i class="fas fa-arrow-left"></i> 返回</button>
+        <div style="margin-bottom: 12px;">
+          <button type="button" class="ai-reco-refresh" onclick="closeCompareResultPanel()"><i class="fas fa-arrow-left"></i> 返回</button>
         </div>
-        <div style="padding: 60px 20px; text-align: center; background: #f8fafc; border-radius: 12px; border: 2px dashed #e2e8f0; margin-bottom: 20px;">
+        <div style="padding: 60px 20px; text-align: center; background: #f8fafc; border-radius: 12px; border: 2px dashed #e2e8f0;">
           <div style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;"><i class="fas fa-chart-pie"></i></div>
           <div style="font-size: 16px; color: #64748b; margin-bottom: 8px;">比质比价结果区域</div>
           <div style="font-size: 13px; color: #94a3b8;">（占位符 - 后续提供样式）</div>
         </div>
       `;
-      document.getElementById('analysisContent').innerHTML = html;
-      updatePageHints('分析页面五', '寻源页面一');
-      updateSourcingAndInquiry(products);
+      document.getElementById('aiCompareResultBody').innerHTML = html;
+      document.getElementById('aiSourcingPanel').style.display = 'none';
+      document.getElementById('aiInquiryPanel').style.display = 'none';
+      document.getElementById('aiCompareResultPanel').style.display = 'flex';
+      renderCompareListPage();
+    }
+    
+    function closeCompareResultPanel() {
+      document.getElementById('aiCompareResultPanel').style.display = 'none';
+      document.getElementById('aiSourcingPanel').style.display = '';
+      document.getElementById('aiInquiryPanel').style.display = '';
+      if (lastRightColumnProducts.length) {
+        updateSourcingAndInquiry(lastRightColumnProducts);
+      }
+      renderAnalysisPage4();
     }
     
     // 返回列表
@@ -2697,12 +2916,16 @@
           <button type="button" class="ai-reco-refresh" onclick="refreshRecommendProducts()"><i class="fas fa-sync-alt"></i> 换一批</button>
         </div>
         <div class="ai-product-grid">
-          ${products.map(function(p) {
+          ${products.map(function(p, i) {
             var nameEsc = p.name.replace(/'/g, "\\'");
+            var dotColor = PRODUCT_COLORS[i % PRODUCT_COLORS.length];
             return `
             <div class="ai-product-card">
               <img src="${p.img}" class="ai-product-card-img" alt="">
-              <div class="ai-product-card-name">${p.name}</div>
+              <div class="ai-product-card-name-wrap">
+                <span class="ai-product-color-dot" style="background:${dotColor}"></span>
+                <div class="ai-product-card-name">${p.name}</div>
+              </div>
               <div class="ai-product-card-supplier-name">${p.brand}</div>
               <div class="ai-product-card-meta">
                 <span class="ai-product-card-price">¥${p.price.toFixed(2)}/${p.unit}</span>
@@ -2725,7 +2948,7 @@
       document.getElementById('analysisContent').innerHTML = html;
       updatePageHints('分析页面一', '寻源页面一');
       renderSourcingSuppliers(firstProductId);
-      renderInquiryChart();
+      renderInquiryChartDual(products);
     }
     
     function renderSourcingSuppliers(firstProductId) {
@@ -2763,7 +2986,7 @@
       showProductDetail(product.name);
       var supplier = mockSuppliers.find(function(s) { return s.id === supplierId; });
       if (supplier) renderSourcingSupplierDetail(supplier);
-      renderInquiryChart(product.price);
+      renderInquiryChartDual([product]);
     }
     
     function renderInquiryChart(refPriceOverride) {
@@ -2845,7 +3068,8 @@
       `;
       document.getElementById('analysisContent').innerHTML = html;
       renderSourcingSupplierDetail(mockSuppliers[0]);
-      renderInquiryChart(product.price);
+      var listForChart = inquiryChartProducts.length ? inquiryChartProducts : [product];
+      renderInquiryChartDual(listForChart, product.id);
     }
     
     function showBudgetProducts(budget) {
